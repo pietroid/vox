@@ -1,7 +1,8 @@
 /// The spacing, radius, and sizing tokens.
 ///
 /// One 4pt grid, so every gap, pad, and corner in the app comes from the same
-/// scale. Nothing hard-codes a number that could have come from here.
+/// scale. Nothing hard-codes a number that could have come from here. The
+/// shape is round and airy: pill buttons and fields, soft cards.
 abstract final class AppSpacing {
   /// 4pt. Hairline gaps, icon-to-label inside a dense control.
   static const s1 = 4.0;
@@ -31,13 +32,14 @@ abstract final class AppSpacing {
   static const s16 = 64.0;
 
   /// The corner radius of a card or a sheet.
-  static const cardRadius = 24.0;
+  static const cardRadius = 28.0;
 
-  /// The corner radius of a chip, a menu, or an inline surface.
-  static const chipRadius = 14.0;
+  /// The corner radius of a chip, a menu, a chat bubble, or an inline
+  /// surface.
+  static const chipRadius = 20.0;
 
-  /// The corner radius of a button and a small control.
-  static const buttonRadius = 12.0;
+  /// The corner radius of a button: a pill.
+  static const buttonRadius = 999.0;
 
   /// A fully rounded corner, for pills and tap targets.
   static const pillRadius = 999.0;
@@ -45,8 +47,22 @@ abstract final class AppSpacing {
   /// The minimum tap target, per Fitts's law.
   static const tapTarget = 44.0;
 
+  /// The height of a button.
+  static const buttonHeight = 52.0;
+
   /// The height of the app's single-line prompt field.
-  static const fieldHeight = 52.0;
+  static const fieldHeight = 56.0;
+
+  /// The corner radius of a field: a pill at one line, and soft when it
+  /// grows to several.
+  static const double fieldRadius = fieldHeight / 2;
+
+  /// The round controls of a call (mute, captions, hang up): big enough to
+  /// hit without looking.
+  static const callControl = 64.0;
+
+  /// The agent's presence in a call: the teal dot and the halo around it.
+  static const presence = 120.0;
 
   /// The default icon size.
   static const iconSize = 24.0;

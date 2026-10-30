@@ -124,11 +124,11 @@ class AppButton extends StatelessWidget {
     final style = FilledButton.styleFrom(
       backgroundColor: background,
       disabledBackgroundColor: background,
-      minimumSize: Size(expand ? double.infinity : 0, AppSpacing.tapTarget),
+      minimumSize: Size(expand ? double.infinity : 0, AppSpacing.buttonHeight),
       padding: EdgeInsets.symmetric(
         horizontal: variant == AppButtonVariant.tertiary
             ? AppSpacing.s4
-            : AppSpacing.s5,
+            : AppSpacing.s6,
       ),
       elevation: 0,
       shape: RoundedRectangleBorder(

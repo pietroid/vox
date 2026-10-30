@@ -1,0 +1,5 @@
+// The iOS OAuth clients, reversed: the URL scheme Google Sign-In returns
+// to. One per flavor, since each client is tied to one bundle ID. Not
+// secrets. Written by the setup CLI; see SETUP.md.
+GOOGLE_IOS_REVERSED_CLIENT_ID[config=*-production] = com.googleusercontent.apps.1011897201030-1lnp9kjs65jijk4v81s8pdm9g2m0muep
+GOOGLE_IOS_REVERSED_CLIENT_ID[config=*-dev] = com.googleusercontent.apps.1082350080105-lmrttpim8mg4lcf6104go6l55gr7fd3u

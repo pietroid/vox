@@ -25,4 +25,30 @@ class AppIcons {
 
   /// Closes a page or a sheet.
   static const close = AppIconData.phosphor(PhosphorIconsRegular.x);
+
+  /// Starts a call with the agent.
+  static const call = AppIconData.phosphor(PhosphorIconsRegular.phone);
+
+  /// The microphone, open: the call's mute button.
+  static const microphone = AppIconData.phosphor(
+    PhosphorIconsRegular.microphone,
+  );
+
+  /// The microphone, muted.
+  static const microphoneOff = AppIconData.phosphor(
+    PhosphorIconsRegular.microphoneSlash,
+  );
+
+  /// The call's live captions, shown.
+  static const captions = AppIconData.phosphor(PhosphorIconsRegular.subtitles);
+
+  /// The call's live captions, hidden.
+  static const captionsOff = AppIconData.phosphor(
+    PhosphorIconsRegular.subtitlesSlash,
+  );
+
+  /// Ends a call: the receiver put down, filled.
+  static const hangUp = AppIconData.phosphor(
+    PhosphorIconsFill.phoneDisconnect,
+  );
 }

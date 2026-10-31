@@ -1,6 +1,7 @@
 import 'package:analytics/analytics.dart';
 import 'package:app_ui/app_ui.dart';
 import 'package:auth/auth.dart';
+import 'package:call/call.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:l10n/l10n.dart';
@@ -27,6 +28,11 @@ class App extends StatelessWidget {
              path: '/',
              name: 'Home',
              builder: (context, state) => const HomePage(),
+           ),
+           GoRoute(
+             path: '/ligacao',
+             name: 'Ligação',
+             builder: (context, state) => const CallPage(),
            ),
            GoRoute(
              path: '/assistente',

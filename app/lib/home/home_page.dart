@@ -5,10 +5,11 @@ import 'package:l10n/l10n.dart';
 import 'package:vox/app/app.dart';
 
 /// {@template home_page}
-/// The signed-in home: blank, waiting for the app to be built on it.
+/// The signed-in home: the way into a call with the agent.
 ///
-/// The greeting says who is signed in, the icon beside it signs out, and the
-/// one button opens the assistant.
+/// The greeting says who is signed in, the icon beside it signs out, the
+/// one accent button starts a call, and the quiet one under it opens the
+/// written conversation, the fallback.
 /// {@endtemplate}
 class HomePage extends StatelessWidget {
   /// {@macro home_page}
@@ -39,15 +40,25 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: AppEmptyState(
-        title: l10n.homeEmptyTitle,
-        body: l10n.homeEmptyBody,
-        action: AppButton.icon(
-          onPressed: () => context.push('/assistente'),
-          icon: const AppIcon(
-            iconData: AppIcons.assistant,
-            color: AppColors.onAccent,
-          ),
-          text: l10n.assistantOpen,
+        title: l10n.homeCallTitle,
+        body: l10n.homeCallBody,
+        action: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: AppSpacing.s2,
+          children: [
+            AppButton.icon(
+              onPressed: () => context.push('/ligacao'),
+              icon: const AppIcon(
+                iconData: AppIcons.call,
+                color: AppColors.onAccent,
+              ),
+              text: l10n.homeCallStart,
+            ),
+            AppButton.text(
+              onPressed: () => context.push('/assistente'),
+              text: l10n.homeWrite,
+            ),
+          ],
         ),
       ),
     );

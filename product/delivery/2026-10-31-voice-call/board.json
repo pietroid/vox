@@ -1,0 +1,138 @@
+{
+ "title": "Vox: a call with the agent, streamed through Deepgram",
+ "screens": [
+  {
+   "png": "img/mockup-1.png",
+   "title": "1 · Home",
+   "why": "The call is the app's one action; writing stays as the quiet fallback.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 62,
+     "y": 470,
+     "label": "Começar ligação",
+     "text": "The one accent button, with AppIcons.call (Phosphor phone). Opens /ligacao full screen."
+    },
+    {
+     "id": "B",
+     "x": 100,
+     "y": 522,
+     "label": "Prefiro escrever",
+     "text": "The text chat, demoted to a tertiary button: the RFC keeps it as the quiet fallback."
+    },
+    {
+     "id": "C",
+     "x": 42,
+     "y": 368,
+     "label": "Copy",
+     "text": "Says the rule up front: talk as you would for real; Vox answers when you finish. No button ends a turn."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-2.png",
+   "title": "2 · Ouvindo",
+   "why": "The person has the turn: the hollow ring, a halo that follows their voice.",
+   "pins": [
+    {
+     "id": "D",
+     "x": 290,
+     "y": 335,
+     "label": "Halo = your loudness",
+     "text": "RMS of the mic PCM on the phone, ~20×/s, no round trip. Ink, quiet; it never pulses on a timer."
+    },
+    {
+     "id": "E",
+     "x": 195,
+     "y": 600,
+     "label": "Last question, faded",
+     "text": "Captions are only the agent's: its last sentence stays in ink3 while you talk. Your words are never shown back."
+    },
+    {
+     "id": "F",
+     "x": 300,
+     "y": 75,
+     "label": "Timer",
+     "text": "Elapsed time, tabular figures. A talk is capped near 10 min by the server."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-3.png",
+   "title": "3 · Pensando",
+   "why": "Flux heard the end of the turn; the dot breathes until the reply's first audio.",
+   "pins": [
+    {
+     "id": "G",
+     "x": 290,
+     "y": 335,
+     "label": "End of turn, no button",
+     "text": "Flux ends the turn on meaning; after ~20 s of speech it needs 0.9 confidence or a 3 s pause."
+    },
+    {
+     "id": "H",
+     "x": 45,
+     "y": 708,
+     "label": "Fixed phrase",
+     "text": "After a long talk the phone says 'Boa! Deixa eu ver seus números…' at once: a string in app_pt.arb, never generated."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-4.png",
+   "title": "4 · Falando",
+   "why": "The agent answers sentence by sentence; each caption arrives with its audio.",
+   "pins": [
+    {
+     "id": "I",
+     "x": 290,
+     "y": 335,
+     "label": "Teal rings",
+     "text": "Filled dot; rings swell with the loudness of the audio being played."
+    },
+    {
+     "id": "J",
+     "x": 30,
+     "y": 622,
+     "label": "Numbers from code",
+     "text": "(the faded line) Pace and pauses are measured in code from Flux's word timings; the model only turns them into advice."
+    },
+    {
+     "id": "K",
+     "x": 360,
+     "y": 622,
+     "label": "Cut in",
+     "text": "(the line at full ink) Speak while it talks and it stops: Flux's start of turn cancels the reply and drains the player."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-5.png",
+   "title": "5 · Mudo, sem legendas",
+   "why": "The two toggles, moved from their default, turn ink like a phone's call buttons.",
+   "pins": [
+    {
+     "id": "L",
+     "x": 111,
+     "y": 735,
+     "label": "Mute",
+     "text": "Stops sending PCM; the server keeps Flux alive with keep-alives. Ring goes grey and still: 'Microfone desligado'."
+    },
+    {
+     "id": "M",
+     "x": 195,
+     "y": 735,
+     "label": "Captions off",
+     "text": "Hides the captions; their room is kept, so the dot never moves."
+    },
+    {
+     "id": "N",
+     "x": 279,
+     "y": 735,
+     "label": "Hang up",
+     "text": "The one red thing. Closes the socket, both Deepgram sockets with it, and the session's cost is logged."
+    }
+   ]
+  }
+ ]
+}

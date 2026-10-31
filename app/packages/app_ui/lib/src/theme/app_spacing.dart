@@ -64,6 +64,11 @@ abstract final class AppSpacing {
   /// The agent's presence in a call: the teal dot and the halo around it.
   static const presence = 120.0;
 
+  /// The room a call keeps for its captions (two faded lines, three at full
+  /// ink), held even when they are empty or hidden, so the presence never
+  /// moves while the person looks at it.
+  static const callCaptions = 120.0;
+
   /// The default icon size.
   static const iconSize = 24.0;
 

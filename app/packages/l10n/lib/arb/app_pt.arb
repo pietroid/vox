@@ -25,5 +25,26 @@
   "assistantHint": "Pergunte qualquer coisa",
   "assistantSend": "Enviar",
   "assistantEmpty": "Como posso ajudar?",
-  "assistantFailed": "O assistente não respondeu. Tente de novo."
+  "assistantFailed": "O assistente não respondeu. Tente de novo.",
+  "homeCallTitle": "Pronto para ensaiar?",
+  "homeCallBody": "Ligue e fale como falaria de verdade. O Vox responde quando você terminar.",
+  "homeCallStart": "Começar ligação",
+  "homeWrite": "Prefiro escrever",
+  "callTitle": "Assistente",
+  "callConnecting": "Conectando…",
+  "callListening": "Ouvindo",
+  "callThinking": "Pensando",
+  "callSpeaking": "Falando",
+  "callMuted": "Microfone desligado",
+  "callMute": "Desligar o microfone",
+  "callUnmute": "Ligar o microfone",
+  "callCaptionsHide": "Esconder legendas",
+  "callCaptionsShow": "Mostrar legendas",
+  "callHangUp": "Encerrar ligação",
+  "callAcknowledge": "Boa! Deixa eu ver seus números…",
+  "@callAcknowledge": {
+    "description": "Said by the phone's own voice the moment a long talk ends, to cover the wait for the agent's feedback. A fixed phrase, never generated."
+  },
+  "callUnavailable": "A ligação não está disponível agora. Tente mais tarde ou converse por escrito.",
+  "callDropped": "A ligação caiu. Tente de novo."
 }

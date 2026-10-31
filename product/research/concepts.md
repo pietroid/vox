@@ -18,10 +18,14 @@ RFCs: [voice pipeline](2026-10-30-voice-pipeline/README.md).
   sentence by sentence and cover a known wait with a fixed phrase. Read:
   [ElevenLabs latency guide](https://elevenlabs.io/blog/voice-agent-latency-optimization).
   Met in: [voice pipeline](2026-10-30-voice-pipeline/README.md).
-- **Turn detection is a mode, not a constant.** A call ends a turn at a
-  pause; a rehearsal's pauses are part of the talk, so a talk is ended by
-  the speaker and the detector only runs in conversation. Read:
-  [Deepgram Flux](https://developers.deepgram.com/docs/models-languages-overview).
+- **The end of a turn is in the words, the pause only confirms it.**
+  Pauses inside a turn run longer than the gaps between speakers, so a
+  silence timer fires on pauses as often as on real ends (56% vs 48% at
+  0.5 s). Judge the end on meaning, ask for more certainty as a turn grows
+  long, and keep a long silence as the backstop; no button, as on a call.
+  (Replaces "turn detection is a mode", ruled out on review.) Read:
+  [Heldner & Edlund 2010](https://doi.org/10.1016/j.wocn.2010.08.002),
+  [Flux configure](https://developers.deepgram.com/docs/flux/configure).
   Met in: [voice pipeline](2026-10-30-voice-pipeline/README.md).
 - **The screen's states are the pipeline's events.** A voice UI's states
   (listening, thinking, speaking) and captions come from turn events and

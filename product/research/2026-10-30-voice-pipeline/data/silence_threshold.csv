@@ -1,0 +1,5 @@
+corpus,threshold_ms,gaps_captured_pct,pauses_captured_pct
+Swedish Map Task,500,51.1,59.6
+HCRC Map Task,500,47.5,56.0
+Swedish Map Task,1000,29.1,31.0
+HCRC Map Task,1000,25.1,27.7

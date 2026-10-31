@@ -5,6 +5,9 @@
  * Keyed by method and the route as Nest declares it, without the global
  * prefix, so an id in the path never reaches an event name. A new write
  * route gets its row here.
+ *
+ * The call (`wss /api/assistant/voice`) is no route: its gateway sends one
+ * `voice_call` when it ends, with counts and cost, never words or audio.
  */
 const EVENTS: Record<string, string> = {
   'POST /assistant/chat': 'assistant_turn',

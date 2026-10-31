@@ -25,6 +25,7 @@ written. Code, comments, commits and this file stay in English.
   production. `npm run db:local` runs an in-memory Postgres (PGlite) for
   working offline.
 - **Assistant:** OpenRouter, behind `POST /api/assistant/chat`.
+- **Voice:** Deepgram Flux STT and Flux TTS, behind `wss /api/assistant/voice`.
 - **Analytics:** PostHog, off until a key is set.
 - **Deploy:** two ARM64 images on GHCR (`vox-backend`,
   `vox-web`), pulled by a Raspberry Pi over SSH through a
@@ -44,15 +45,18 @@ app/
     api_client/         Dio + bearer token interceptor
     app_ui/             the design system: AppBrand, tokens, theme, widgets
     auth/               Better Auth client: Google sign-in, token store
+    call/               the voice call: screen, cubit, socket, mic, player
     l10n/               every user-facing string (pt-BR)
 server/
   src/
     analytics/          PostHog: the provider, the route → event table
     assistant/          OpenRouter client, the assistant's routes
+      voice/            the call: WebSocket gateway, Deepgram, metrics, coach
     auth/               Better Auth instance + SessionGuard
     db/                 Drizzle schema + pool + boot-time migrations
     users/              /users/me
   drizzle/              generated SQL migrations (committed)
+  scripts/              local Postgres; Deepgram probe and a whole call end to end
 deploy/                 docker-compose.yml, nginx.conf, web.Dockerfile
 scripts/                Pi and GitHub setup (pi_setup.sh, gh_setup.sh,
                         cloudflare_add_domain.sh)
@@ -104,6 +108,18 @@ Without `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` the chat answers 503 and
 everything else works. The system prompt is `systemPrompt` in
 `server/src/assistant/assistant.service.ts`; tools go in the second argument
 of `OpenRouterClient.generate`.
+
+## The voice call
+
+The home's main action. `wss /api/assistant/voice` (one socket per call,
+signed in on the upgrade) relays the phone's mic to Deepgram Flux STT,
+measures each take in code (`speech-metrics.ts`), streams the model's reply
+sentence by sentence into Flux TTS, and sends the phone `state`, `caption`
+and audio. **Flux ends turns, never a button**; after 10 s only a 3 s
+silence does. Nothing is stored. Off without `DEEPGRAM_API_KEY` (closes
+4503). Server in `server/src/assistant/voice/`, app in
+`app/packages/call/`; contract and rules in
+[product/spec/voice-call.md](./product/spec/voice-call.md).
 
 ## The design system
 

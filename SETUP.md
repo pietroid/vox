@@ -80,6 +80,12 @@ scp scripts/pi_setup.sh scripts/cloudflare_add_domain.sh server.env focus:
 ssh -t focus ./pi_setup.sh vox <web port> <backend port> vox.pietroteruya.dev server.env
 ```
 
+The voice call needs `DEEPGRAM_API_KEY` in that `.env` (a key from
+[console.deepgram.com](https://console.deepgram.com), with the
+OpenRouter key and model set too); without it the call screen says the call
+isn't available. Its WebSocket, `/api/assistant/voice`, is upgraded by
+`deploy/nginx.conf` and passes the Cloudflare tunnel as is.
+
 To roll back, set `APP_TAG=<commit sha>` (one of the five kept) in the
 `.env` and run `docker compose up -d`.
 

@@ -45,7 +45,7 @@ export class SessionGuard implements CanActivate {
 }
 
 /** Node's headers as the Fetch API's, which is what Better Auth reads. */
-function headersOf(request: Request): Headers {
+export function headersOf(request: { headers: Request['headers'] }): Headers {
   const headers = new Headers();
 
   for (const [key, value] of Object.entries(request.headers)) {

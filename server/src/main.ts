@@ -6,6 +6,7 @@ import { ANALYTICS, Analytics } from './analytics/analytics';
 import { AppModule } from './app.module';
 import { Auth, listOf } from './auth/auth';
 import { AUTH } from './auth/auth.tokens';
+import { VoiceGateway } from './assistant/voice/voice.gateway';
 import { LoggingInterceptor } from './common/logging.interceptor';
 import { Database, DB, migrateDatabase } from './db/db';
 
@@ -48,6 +49,9 @@ async function bootstrap() {
     new LoggingInterceptor(app.get<Analytics>(ANALYTICS)),
   );
   app.enableShutdownHooks();
+
+  // The call's WebSocket shares the HTTP server, beside the routes.
+  app.get(VoiceGateway).attach(app.getHttpServer());
 
   await app.listen(process.env.PORT ?? 3000);
   logger.log(`Server listening on port ${process.env.PORT ?? 3000}`);

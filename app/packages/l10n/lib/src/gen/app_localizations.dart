@@ -184,6 +184,114 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'O assistente não respondeu. Tente de novo.'**
   String get assistantFailed;
+
+  /// No description provided for @homeCallTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pronto para ensaiar?'**
+  String get homeCallTitle;
+
+  /// No description provided for @homeCallBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligue e fale como falaria de verdade. O Vox responde quando você terminar.'**
+  String get homeCallBody;
+
+  /// No description provided for @homeCallStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Começar ligação'**
+  String get homeCallStart;
+
+  /// No description provided for @homeWrite.
+  ///
+  /// In pt, this message translates to:
+  /// **'Prefiro escrever'**
+  String get homeWrite;
+
+  /// No description provided for @callTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Assistente'**
+  String get callTitle;
+
+  /// No description provided for @callConnecting.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conectando…'**
+  String get callConnecting;
+
+  /// No description provided for @callListening.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ouvindo'**
+  String get callListening;
+
+  /// No description provided for @callThinking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pensando'**
+  String get callThinking;
+
+  /// No description provided for @callSpeaking.
+  ///
+  /// In pt, this message translates to:
+  /// **'Falando'**
+  String get callSpeaking;
+
+  /// No description provided for @callMuted.
+  ///
+  /// In pt, this message translates to:
+  /// **'Microfone desligado'**
+  String get callMuted;
+
+  /// No description provided for @callMute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Desligar o microfone'**
+  String get callMute;
+
+  /// No description provided for @callUnmute.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligar o microfone'**
+  String get callUnmute;
+
+  /// No description provided for @callCaptionsHide.
+  ///
+  /// In pt, this message translates to:
+  /// **'Esconder legendas'**
+  String get callCaptionsHide;
+
+  /// No description provided for @callCaptionsShow.
+  ///
+  /// In pt, this message translates to:
+  /// **'Mostrar legendas'**
+  String get callCaptionsShow;
+
+  /// No description provided for @callHangUp.
+  ///
+  /// In pt, this message translates to:
+  /// **'Encerrar ligação'**
+  String get callHangUp;
+
+  /// No description provided for @callUnavailable.
+  ///
+  /// In pt, this message translates to:
+  /// **'A ligação não está disponível agora. Tente mais tarde ou converse por escrito.'**
+  String get callUnavailable;
+
+  /// No description provided for @callDropped.
+  ///
+  /// In pt, this message translates to:
+  /// **'A ligação caiu. Tente de novo.'**
+  String get callDropped;
+
+  /// No description provided for @callMicrophoneDenied.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox precisa do microfone para a ligação. Permita o acesso nos Ajustes do telefone.'**
+  String get callMicrophoneDenied;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

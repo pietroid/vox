@@ -40,7 +40,8 @@ void main() {
     );
 
     expect(find.text('Olá, Ana'), findsOneWidget);
-    expect(find.text('Falar com o assistente'), findsOneWidget);
+    expect(find.text('Começar ligação'), findsOneWidget);
+    expect(find.text('Prefiro escrever'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Sair'));
     await tester.pump();

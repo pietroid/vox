@@ -275,12 +275,6 @@ abstract class AppLocalizations {
   /// **'Encerrar ligação'**
   String get callHangUp;
 
-  /// Said by the phone's own voice the moment a long talk ends, to cover the wait for the agent's feedback. A fixed phrase, never generated.
-  ///
-  /// In pt, this message translates to:
-  /// **'Boa! Deixa eu ver seus números…'**
-  String get callAcknowledge;
-
   /// No description provided for @callUnavailable.
   ///
   /// In pt, this message translates to:
@@ -292,6 +286,12 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'A ligação caiu. Tente de novo.'**
   String get callDropped;
+
+  /// No description provided for @callMicrophoneDenied.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox precisa do microfone para a ligação. Permita o acesso nos Ajustes do telefone.'**
+  String get callMicrophoneDenied;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

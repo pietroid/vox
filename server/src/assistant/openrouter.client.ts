@@ -131,6 +131,80 @@ export class OpenRouterClient {
     }
   }
 
+  /**
+   * One generation, streamed: the reply's text as it is written, so a call
+   * can speak its first sentence while the rest is still coming. No tools,
+   * no retry (a call can't wait for one); [signal] stops it mid-way, as
+   * when the person cuts in. [onUsage] hears what it cost at the end.
+   */
+  async *stream(
+    messages: ChatMessage[],
+    signal: AbortSignal,
+    onUsage?: (usage: ModelUsage) => void,
+  ): AsyncGenerator<string> {
+    if (!this.configured) {
+      throw new ModelUnavailableError('OpenRouter is not configured');
+    }
+
+    let response: Response;
+    try {
+      response = await fetch(this._url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this._apiKey}`,
+          'HTTP-Referer': 'https://vox.pietroteruya.dev',
+          'X-Title': 'Vox',
+        },
+        body: JSON.stringify({
+          model: this.model,
+          ...(this._fallbacks.length > 0
+            ? { models: [this.model, ...this._fallbacks] }
+            : {}),
+          messages,
+          stream: true,
+          temperature: 0.3,
+          reasoning: { effort: this._effort, exclude: true },
+          provider: { sort: 'latency' },
+          usage: { include: true },
+        }),
+        signal: AbortSignal.any([signal, AbortSignal.timeout(TIMEOUT_MS)]),
+      });
+    } catch (error) {
+      if (signal.aborted) return;
+      throw new ModelUnavailableError(
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+    if (!response.ok || response.body === null) {
+      throw new ModelUnavailableError(
+        `OpenRouter returned ${response.status}`,
+        response.status,
+      );
+    }
+
+    try {
+      for await (const data of serverSentEvents(response.body)) {
+        if (data === '[DONE]') return;
+        const chunk = JSON.parse(data) as Record<string, unknown>;
+        const choice = (
+          chunk.choices as Record<string, unknown>[] | undefined
+        )?.[0];
+        const delta = choice?.delta as Record<string, unknown> | undefined;
+        if (typeof delta?.content === 'string' && delta.content !== '') {
+          yield delta.content;
+        }
+        const usage = chunk.usage ? usageOf(chunk) : undefined;
+        if (usage) onUsage?.(usage);
+      }
+    } catch (error) {
+      if (signal.aborted) return;
+      throw new ModelUnavailableError(
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  }
+
   private async _once(
     messages: ChatMessage[],
     tools: ToolDefinition[],
@@ -229,4 +303,24 @@ function toolCallsOf(value: unknown[]): ToolCall[] {
       },
     ];
   });
+}
+
+/**
+ * The `data:` payloads of a server-sent event stream, one per event.
+ * Comment lines (OpenRouter's `: OPENROUTER PROCESSING`) are skipped.
+ */
+export async function* serverSentEvents(
+  body: AsyncIterable<Uint8Array>,
+): AsyncGenerator<string> {
+  const decoder = new TextDecoder();
+  let buffer = '';
+  for await (const bytes of body) {
+    buffer += decoder.decode(bytes, { stream: true });
+    let end: number;
+    while ((end = buffer.indexOf('\n')) >= 0) {
+      const line = buffer.slice(0, end).trim();
+      buffer = buffer.slice(end + 1);
+      if (line.startsWith('data:')) yield line.slice(5).trim();
+    }
+  }
 }

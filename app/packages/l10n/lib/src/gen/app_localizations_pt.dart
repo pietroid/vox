@@ -104,11 +104,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get callHangUp => 'Encerrar ligação';
 
   @override
-  String get callAcknowledge => 'Boa! Deixa eu ver seus números…';
-
-  @override
   String get callUnavailable => 'A ligação não está disponível agora. Tente mais tarde ou converse por escrito.';
 
   @override
   String get callDropped => 'A ligação caiu. Tente de novo.';
+
+  @override
+  String get callMicrophoneDenied => 'O Vox precisa do microfone para a ligação. Permita o acesso nos Ajustes do telefone.';
 }

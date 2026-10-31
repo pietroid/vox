@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:analytics/analytics.dart';
 import 'package:api_client/api_client.dart';
 import 'package:auth/auth.dart';
+import 'package:call/call.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -57,6 +58,12 @@ Future<void> main() async {
         RepositoryProvider<AuthRepository>(create: (_) => authRepository),
         RepositoryProvider<AssistantRepository>(
           create: (_) => AssistantRepository(apiClient: apiClient),
+        ),
+        RepositoryProvider<CallService>(
+          create: (_) => ServerCallService(
+            apiBaseUrl: kApiBaseUrl,
+            token: authRepository.token,
+          ),
         ),
       ],
       child: BlocProvider<AppBloc>(

@@ -16,8 +16,12 @@ enum CallPhase {
   /// The agent's audio is playing; back to [listening] when it drains.
   speaking,
 
-  /// The server has no voice to offer (it answered 503).
+  /// The server has no voice to offer (it closed with 4503), or this
+  /// platform can't call yet.
   unavailable,
+
+  /// The person didn't let the app use the mic.
+  microphoneDenied,
 
   /// The connection fell mid-call.
   dropped,

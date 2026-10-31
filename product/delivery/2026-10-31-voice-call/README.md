@@ -1,6 +1,6 @@
 # A call with the agent, streamed through Deepgram
 
-2026-10-31 · delivery (draft: design done, build next) · track: **mockup** ·
+2026-10-31 · delivery · track: **mockup** · ships rollout phases 0 and 1 ·
 from the RFC [*Stream the call through Deepgram, measure in code, coach with the model*](../../research/2026-10-30-voice-pipeline/README.md)
 
 ## 1. The prompt
@@ -78,91 +78,220 @@ icons `call`, `microphone`, `microphoneOff`, `captions`, `captionsOff`,
 `AppSpacing.callCaptions` (120, the room kept for captions). Nothing generic
 "AI": the presence is the dot from the mark.
 
-## Build brief
+## 3. What was built
 
-*Phase 3 starts here; Phase 4 replaces this section with sections 3–5.*
+![The real build, six scenes: home; Ouvindo with the halo up and the agent's last sentence faded; Pensando; Falando with two captions; muted with captions hidden; unavailable with only the hang-up](img/build-strip.png)
 
-### Files the design session wrote (kept on this branch for the build)
+The real `CallPage` and `CallCubit` over a scripted call (fake socket, mic
+and speaker); every state on screen came through the cubit, not seeded.
+Each alone: [1](img/build-1.png) · [2](img/build-2.png) ·
+[3](img/build-3.png) · [4](img/build-4.png) · [5](img/build-5.png) ·
+[6](img/build-6.png). The timer reads 00:04 because the shots are taken four
+seconds into each call.
 
-- `app/lib/voice_call_preview.dart`: the preview entry point, 5 scenes.
-  Delete it at the end of Phase 4.
-- `app/packages/call/`: new package; `CallState` (`CallPhase`: connecting,
-  listening, thinking, speaking, unavailable, dropped), `CallCubit` (seeded;
-  toggles; `captioned`), `CallPage`/`CallView`.
-- `app/packages/app_ui/lib/src/widgets/app_presence.dart`,
-  `app_call_control.dart`; `app_icons.dart`, `app_spacing.dart`,
-  `app_ui.dart` (exports).
-- `app/lib/home/home_page.dart` (the two buttons), `app/lib/app/view/app.dart`
-  (route `/ligacao`, screen name *Ligação*), `app/pubspec.yaml` (+ `call`).
-- `app/packages/l10n/lib/arb/app_pt.arb` + `gen/`: `homeCall*`, `homeWrite`,
-  `call*` (incl. `callAcknowledge`, `callUnavailable`, `callDropped`).
+### Phase 0: what Deepgram did against the key
 
-### Server (`server/src/assistant/`)
+`server/scripts/deepgram-probe.mjs`, on the RFC's two synthetic takes
+(`code/make_samples.sh`, macOS voice Luciana, 16 kHz).
 
-1. **Phase 0 first:** `scripts`-style probe (`server/scripts/deepgram-probe.ts`
-   or similar) that opens Flux TTS `/v2/speak` in `pt` and Flux STT
-   `flux-general-multi`, prints time to first audio and end-of-turn events
-   on a recorded pt-BR talk (`product/research/.../code/make_samples.sh`
-   makes one). Record what it printed in section 3.
-2. `voice.gateway.ts`: WebSocket at `/api/assistant/voice`, authenticated
-   like `SessionGuard` (session cookie or bearer, on the upgrade); 503-style
-   close without `DEEPGRAM_API_KEY`. Relays PCM 16 kHz mono to Flux STT;
-   sends `{state}` (listening / thinking / speaking) and `{caption}` with
-   each audio sentence; after ~20 s of speech sends `Configure`
-   (`eot_threshold` 0.9, `eot_timeout_ms` 3000), back to defaults next
-   turn; `StartOfTurn` while replying cancels the LLM stream and TTS.
-   Keep-alives while muted. Talk cap ~10 min.
-3. `deepgram-tts.ts`: sentences in, audio chunks out (Flux TTS, pt voice).
-4. `speech-metrics.ts`: port of `code/speech_metrics.py` on Flux word
-   timings (wpm, pause share, longest pause; voiced time with no word as
-   filler time); specs against `data/takes.jsonl`.
-5. `assistant.service.ts`: streamed OpenRouter reply split by sentence; a
-   coaching system prompt that receives transcript + metrics; the person's
-   own baseline from the session's first take.
-6. Cost per turn (STT seconds, TTS chars, LLM tokens) in the server log;
-   the session's row in `analytics/events.ts` (no text, no audio). Audio
-   never stored.
-7. `deploy/nginx.conf`: WebSocket upgrade on `/api/assistant/voice`;
-   Cloudflare tunnel passes WebSockets by default (check). Nest needs
-   `@nestjs/websockets` + `ws` adapter.
-8. `DEEPGRAM_API_KEY` in `server/.env.example` and `SETUP.md`.
+**Flux TTS, pt-BR.** Two sentences, `linear16` 24 kHz:
+
+| Voice | Connect | First audio after `Speak` |
+|---|---|---|
+| `flux-bianca-pt` | 637 · 610 ms | 283 · 252 ms |
+| `flux-mariana-pt` | 408 ms | 190 ms |
+| `flux-bruno-pt` | 383 ms | 191 ms |
+| `flux-rodrigo-pt` | 377 ms | 189 ms |
+
+Audio starts after a `Speak` without waiting for `Flush` (first bytes at
+254 ms), and `Interrupt` stops it. Bianca's audio, fed back into Flux STT,
+came back word for word, except that two `Speak` messages joined as
+"minuto.Agora" were read as **"minuto ponto"**: Flux adds no space between
+messages, so every sentence is now sent with a trailing one. Latency is
+well under the RFC's estimate; the voice is understood by Flux, but **no
+person has listened to it yet** (the WAVs are in `/tmp/vox-probe-*.wav` on
+the Mac).
+
+**Flux STT, end of turn.** The paced take (106 words, 0.9 s pauses between
+sentences) streamed in real time:
+
+| `eot_threshold` / `eot_timeout_ms` | Turns Flux made of one talk | Ended by |
+|---|---|---|
+| 0.7 / 5000 (defaults) | **6**: at 19.6, 29.7, 36.1, 45.4, 50.9, 53.0 s | meaning |
+| 0.8 / 3000 | 3 | meaning |
+| 0.9 / 3000 and 0.9 / 2000 | 3 | meaning (confidence 0.92 at a sentence end) |
+| 1.0 / 3000 | **1** | silence, 3 s after the last word |
+| 0.7, `Configure` 0.9 + 3 s at 20 s (the RFC's plan) | 6 (the first cut came at 19.6 s, before the switch) | meaning |
+
+The rushed take (no pauses) stayed one turn under the RFC's plan. On a short
+answer (two sentences), 0.7 ends 0.5 s after the speech, 0.9 1.4 s after,
+1.0 3 s after. So **the RFC's long-turn rule would have cut a paced talk**,
+and the build changes it: a turn starts at the defaults (short answers end
+fast), and **after 10 s of speech only 3 s of silence ends it** (`eot_threshold`
+1.0). A turn Flux still ends early is merged with the next one when the
+agent hasn't spoken yet. No button was needed.
+
+### A whole call, end to end
+
+`server/scripts/voice-e2e.mjs` drives a `VoiceSession` with the real Flux
+STT, Flux TTS and OpenRouter (`anthropic/claude-haiku-5.5`), the rushed
+take then the paced one streamed as the mic. The second run, abridged:
+
+```
+  0.89 caption "Oi, Ana! O que você quer treinar hoje?"         (first audio 861 ms)
+  4.15 --- streaming rushed.wav
+ 11.71 state thinking   11.99 state listening                    (an early end, merged back)
+ 40.25 --- take ended, silence
+ 43.78 state thinking                                            (3 s silence + ~0.5 s)
+ 43.79 take measured: wpm 184, pauses 6, longest 0.36 s, pause share 0.06, pitch 188 Hz, spread 4.4 st
+ 43.90 caption "Boa! Deixa eu ver seus números…"                 (0.1 s after the turn ended)
+ 49.87 caption "Ana, essa foi a primeira fala longa da ligação, então ela serve de referência."
+ 63.90 caption "O ponto a mudar é o ritmo, que ficou em cerca de cento e oitenta e quatro palavras por minuto."
+ 66.42 interrupt                                                 (the next take started over it: cut-in)
+124.51 take measured: wpm 121, pauses 9, longest 1.18 s, pause share 0.18, pitch 188 Hz, spread 4.2 st
+131.93 caption "Na primeira fala você estava em cerca de cento e oitenta e quatro palavras por minuto,
+               e agora está em cento e vinte e um, com pausas mais longas, a maior de um segundo e dezoito."
+146.96 call ended: 2 turns, 142 s heard, 641 chars spoken, $0.0480
+```
+
+The measured numbers match the RFC's Python script on the same audio
+(`data/takes.jsonl`: 180/118 wpm, 6/9 pauses, 0.36/1.18 s longest,
+0.06/0.18 share, 190 Hz, 4.4 st); pace differs by 3 wpm because it is
+counted on Flux's words. The first run's coach called a Flux mishearing
+("Heido há semanas") the person's mumbling; the prompt now says the
+transcription can swap words, and in the second run it said so instead.
+$0.048 for 2.4 minutes is in line with the RFC's 18¢ per 10 minutes.
+
+The gateway, on a locally running server: a foreign `Origin` gets HTTP 403;
+no token and a wrong bearer both get close **4401** *"Entre de novo para
+ligar."*.
+
+### The contract
+
+**One socket per call; Flux ends turns, never a button; the screen's states
+are the server's events.** `wss /api/assistant/voice`, signed in on the
+upgrade (bearer on the phones, cookie plus a matching `Origin` on the web):
+
+| Direction | Message |
+|---|---|
+| phone → server | binary PCM16 16 kHz mono; `{type:'mute', muted}` |
+| server → phone | `{type:'state', state}` listening · thinking · speaking; `{type:'caption', text}` before its audio; binary PCM16 24 kHz; `{type:'interrupt'}` |
+| close codes | 4401 not signed in · 4503 no voice here · 1011 dropped · 4000 the 30-minute cap |
+
+Full rules in [`product/spec/voice-call.md`](../../spec/voice-call.md).
+
+### Server (`server/src/assistant/voice/`)
+
+- `voice.gateway.ts`: the upgrade on Nest's own HTTP server (`ws`, no
+  `@nestjs/websockets`), Better Auth's session check, the origin check, one
+  `VoiceSession` per socket, one `voice_call` analytics event at the end
+  (seconds, turns, chars, USD; no words).
+- `voice-session.ts`: the call. Relays the mic to Flux and to `VoiceTrack`;
+  muted, feeds Flux 80 ms of silence every 80 ms (Flux STT has no
+  keep-alive message); the turn rule above; measures takes (≥ 15 s) and
+  keeps the first as the reference; the fixed acknowledgement after a talk
+  ≥ 20 s; streams the model, one Flux TTS turn per sentence so each
+  `SpeechStarted` marks where its caption goes; cut-in closes the TTS
+  socket and opens a fresh one (Flux's `Interrupt` can race a sentence that
+  just ended); logs each turn's time to first audio and cost; a 10-minute
+  talk cap (`ForceEndTurn`) and a 30-minute call cap.
+- `deepgram.ts`: Flux STT (`flux-general-multi`, `language_hint=pt`) and
+  Flux TTS (`flux-bianca-pt`) over `ws`, behind `VoiceVendor`.
+- `speech-metrics.ts`: the port of `speech_metrics.py`, pitch measured as
+  the audio arrives (every other 10 ms hop, on loud frames only: ~150 ms of
+  work per minute of talk on the Mac, spread over the call).
+- `coach.ts`: the call's system prompt, the turn message with the numbers,
+  the sentence splitter (drops markdown, which Flux would read aloud).
+- `OpenRouterClient.stream`: the reply as server-sent events, abortable.
+- `deploy/nginx.conf`: a location that upgrades `/api/assistant/voice`,
+  35-minute timeouts. `DEEPGRAM_API_KEY` in `.env.example` and `SETUP.md`.
 
 ### App (`app/packages/call/`)
 
-- A `VoiceConnection` behind an interface (fake in tests and preview):
-  open the socket with the token from `TokenStore`, send mic PCM, receive
-  state/caption/audio. Mic: a streaming recorder with echo cancellation
-  (e.g. `record` stream mode, PCM16 16 kHz); player for streamed PCM
-  (e.g. `flutter_sound` / `just_audio` custom source). RMS of both → `level`.
-- `CallCubit` driven by the connection; the elapsed timer; play
-  `callAcknowledge` with the phone's TTS (`flutter_tts`) on end of a long
-  turn; iOS mic permission string, Android `RECORD_AUDIO`.
-- Cubit and widget tests; `AppPresence` respects reduced motion.
+- `CallCubit` over a `CallService` (the socket, the mic, the speaker);
+  `ServerCallService` in `main.dart`. A 50 ms ticker moves the timer, the
+  halo and a `PlaybackClock` that queues the received voice and captions on
+  one timeline, so a caption shows when its audio starts and Falando lasts
+  while the phone still plays.
+- `RecordMicrophone` (`record`, PCM16 16 kHz, echo cancel and noise
+  suppression, Android's voice-communication source), `PcmVoicePlayer`
+  (`flutter_pcm_sound`, iOS `playAndRecord`), `SocketVoiceLine`
+  (`web_socket_channel`, bearer token).
+- New phase **microphoneDenied** with `callMicrophoneDenied`;
+  `NSMicrophoneUsageDescription` and `RECORD_AUDIO`.
+
+### Tests
+
+- Server, 21 new (`npm test`): metrics on Flux's real word timings of both
+  takes and on synthetic audio (pauses, long pauses, an "é…", pitch the
+  same whatever the chunk size); the splitter; the session over fake
+  Deepgram and model (greeting, sentence by sentence with captions,
+  measuring and the reference, the long-turn `Configure` and its reset, the
+  talk cap, cut-in keeping what was heard, merging an early end, the
+  apology when the model fails, silence while muted, hang-up and cost,
+  Deepgram dropping).
+- App, 13 new in `packages/call` (clock, cubit over fakes, page), and the
+  home's test updated to the call-first home.
+
+### Where the build differs from the mockup
+
+- **The long-turn rule**: 1.0 + 3 s after 10 s, not 0.9 + 3 s after 20 s
+  (pins C, G), from the Phase 0 table above.
+- **The acknowledgement is said by the server in the agent's voice**, not
+  by the phone's TTS (pin H): one voice on the call, no `flutter_tts`, and
+  it's on air 0.1 s after the turn ends. It shows as Falando with its
+  caption, not as Pensando; `callAcknowledge` left the ARB.
+- **The agent greets first** ("Oi, Ana! O que você quer treinar hoje?"),
+  so the call opens with a voice and its caption.
+- **The web build doesn't call**: the RFC put the phones first and the
+  player plugin is the phones'; on the web the screen says the call isn't
+  available (scene 6's text).
+- **Coaching on the person's material** (the RFC's session plan) is not
+  here: rollout phase 2, a follow-up issue.
+
+### Not tested
+
+- **No real phone has made a call.** The app was built for web prints and
+  tested over fakes; the mic, the player and above all **echo
+  cancellation** (whether the agent's voice, on the speaker, triggers a
+  cut-in) are unverified on iOS and Android. On iOS, `record` and
+  `flutter_pcm_sound` each set up the audio session; that they share it
+  well is the first thing to check.
+- The voice through nginx and the Cloudflare tunnel (no deploy from here).
+- A real person's speech: every take was synthetic. The 10 s and 3 s are
+  set from these; the first real talks should confirm them.
 
 ### Decided unattended
 
-- **Track: mockup**, since the call screen is the RFC's main feature.
-- The home's primary action becomes the call; the text chat stays as
-  *Prefiro escrever* (the RFC: "the text chat stays as the quiet fallback").
-- Toggles moved from their default (muted, captions off) turn ink with a
-  dark glyph, like a phone's call buttons; the design system didn't say.
-- Muted shows the ring grey and still, with *Microfone desligado* in place
-  of *Ouvindo*.
-- The halo follows loudness only (no time-based pulse as in the HTML); with
-  reduced motion only Pensando's breath stops.
-- The caption area keeps a fixed height (`AppSpacing.callCaptions`) so the
-  dot never moves between states.
-- Phase 2 (session plan from material) is left for a follow-up: the app
-  has no way to give it material yet. Phases 0 and 1 ship here.
-- Unavailable (no key) and dropped are drawn as a centred line with only the
-  hang-up button; not on the board.
+- The turn rule above, against the RFC's 0.9 + 20 s: its own text says the
+  values are "tuned by the first test against your key".
+- The fixed acknowledgement moved to the server's voice.
+- Voice `flux-bianca-pt` (female, Brazil): its latency was the highest of
+  the four (250–280 ms vs ~190 ms) but well under budget; a one-line change
+  in `deepgram.ts` (`VOICE`) once someone listens.
+- Reasoning `exclude: true` on the streamed call, so no thinking text is
+  spoken; the effort stays `OPENROUTER_REASONING`.
+- An early Flux end flickers Pensando for ~0.3 s before the merge (seen at
+  11.7 s above); left as is.
 
-### Open questions
+## 4. How to turn it on
 
-- None blocking. If the Phase 0 probe shows Flux TTS's pt voice or latency
-  disappointing, the RFC's fallback is the phone's voice (`flutter_tts`):
-  the build would ask on the issue before switching.
+- `DEEPGRAM_API_KEY` in `server/.env.local` (and the Pi's `/opt/vox/.env`),
+  with `OPENROUTER_API_KEY` and `OPENROUTER_MODEL`. Without them the socket
+  closes 4503 and the screen says *"A ligação não está disponível agora."*;
+  the chat works.
+- Deploy as usual: the new nginx location ships in `vox-web`.
+- On a phone: `flutter run --flavor dev --dart-define-from-file env/dev.json`,
+  Começar ligação, allow the mic.
+- To measure again: `node --env-file=.env.local scripts/deepgram-probe.mjs tts|stt …`
+  and `npm run build && node --env-file=.env.local scripts/voice-e2e.mjs take.wav`
+  (in `server/`).
 
-### Cost of the design session
+## 5. Cost and time
 
-Measured by the queue and written in the PR.
+Measured by the queue: see the pull request.
+
+Outside Claude: Deepgram and OpenRouter calls during the build, about
+**$0.15** (two end-to-end calls at ~$0.05, eleven STT probes of ~1 minute,
+five TTS probes), from the session logs and the price list, on the
+person's key and its free credit.

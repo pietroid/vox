@@ -1,5 +1,6 @@
 import 'package:app_ui/app_ui.dart';
 import 'package:call/src/call_cubit.dart';
+import 'package:call/src/call_service.dart';
 import 'package:call/src/call_state.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +17,8 @@ class CallPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CallCubit(),
+      create: (context) =>
+          CallCubit(service: context.read<CallService>())..start().ignore(),
       child: const CallView(),
     );
   }
@@ -63,14 +65,24 @@ class CallView extends StatelessWidget {
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                     ),
-                    Expanded(child: Center(child: _Stage(state: state))),
+                    Expanded(
+                      child: Center(child: _Stage(state: state)),
+                    ),
                     SizedBox(
                       height: AppSpacing.callCaptions,
                       child: state.captionsOn && state.live
-                          ? _Captions(
-                              caption: state.caption,
-                              previous: state.previousCaption,
-                            )
+                          // While the person has the turn, the agent's
+                          // last sentence stays, faded.
+                          ? state.phase == CallPhase.speaking
+                                ? _Captions(
+                                    caption: state.caption,
+                                    previous: state.previousCaption,
+                                  )
+                                : _Captions(
+                                    caption: null,
+                                    previous:
+                                        state.caption ?? state.previousCaption,
+                                  )
                           : null,
                     ),
                     const SizedBox(height: AppSpacing.s6),
@@ -103,7 +115,12 @@ class CallView extends StatelessWidget {
                         AppCallControl.hangUp(
                           icon: AppIcons.hangUp,
                           label: l10n.callHangUp,
-                          onPressed: () => Navigator.of(context).maybePop(),
+                          onPressed: () async {
+                            await cubit.hangUp();
+                            if (context.mounted) {
+                              await Navigator.of(context).maybePop();
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -136,6 +153,7 @@ class _Stage extends StatelessWidget {
     final refusal = switch (state.phase) {
       CallPhase.unavailable => l10n.callUnavailable,
       CallPhase.dropped => l10n.callDropped,
+      CallPhase.microphoneDenied => l10n.callMicrophoneDenied,
       _ => null,
     };
     if (refusal != null) {

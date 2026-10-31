@@ -15,8 +15,6 @@ abstract final class AppTheme {
     final colorScheme =
         ColorScheme.fromSeed(
           seedColor: AppColors.accent,
-          // Light today, which is the default; the brand decides.
-          // ignore: avoid_redundant_argument_values
           brightness: AppBrand.brightness,
         ).copyWith(
           primary: AppColors.accent,
@@ -29,6 +27,7 @@ abstract final class AppTheme {
           outline: AppColors.line,
           outlineVariant: AppColors.line,
           error: AppColors.negative,
+          onError: AppColors.onNegative,
         );
 
     return ThemeData(
@@ -45,8 +44,11 @@ abstract final class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: AppTypography.title,
+        titleTextStyle: AppTypography.barTitle,
         systemOverlayStyle: overlayStyle,
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: AppColors.accent,
       ),
       iconTheme: const IconThemeData(
         color: AppColors.ink2,
@@ -66,14 +68,15 @@ abstract final class AppTheme {
         filled: true,
         fillColor: AppColors.fill,
         hintStyle: AppTypography.body.copyWith(color: AppColors.ink3),
+        // 24pt of body line plus 16pt above and below: fieldHeight.
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.s4,
-          vertical: AppSpacing.s3,
+          horizontal: AppSpacing.s5,
+          vertical: AppSpacing.s4,
         ),
         border: const OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.all(
-            Radius.circular(AppSpacing.chipRadius),
+            Radius.circular(AppSpacing.fieldRadius),
           ),
         ),
       ),

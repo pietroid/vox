@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 /// its mark.
 abstract final class AppBrand {
   /// Whether the app is drawn light or dark.
-  static const Brightness brightness = Brightness.light;
+  static const Brightness brightness = Brightness.dark;
 
-  /// The square app mark, bundled in `app_ui` (pass `package: 'app_ui'`).
+  /// The square app mark, an italic v and a teal dot on the page colour,
+  /// bundled in `app_ui` (pass `package: 'app_ui'`).
   static const String markAsset = 'assets/brand/mark.png';
 }

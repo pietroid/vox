@@ -1,0 +1,9 @@
+pipeline,stt,tts,llm,session_usd,month_100_users_20_sessions_usd,note
+Phone STT + phone TTS,0.0,0.0,0.00331,0.0033,6.62,breaks on long talks
+Groq Whisper + phone TTS,0.004,0.0,0.00331,0.0073,14.62,cheapest with timings
+Groq Whisper + Gemini TTS,0.004,0.03072,0.00331,0.038,76.06,nicer voice
+Gemini hears audio + TTS,0.00346,0.03072,0.00331,0.0375,74.98,no word timings
+OpenAI mini STT + TTS,0.018,0.04,0.00331,0.0613,122.62,
+Deepgram Flux STT + Flux TTS,0.0676,0.108,0.00331,0.1789,357.82,chosen 2026-10-31
+Deepgram Flux STT + phone TTS,0.0676,0.0,0.00331,0.0709,141.82,fallback voice
+Realtime speech-to-speech,0.36,0.64,0.0,1.0,2000.0,estimate

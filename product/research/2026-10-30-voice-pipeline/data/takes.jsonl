@@ -1,0 +1,2 @@
+{"take": "rushed.wav", "duration_s": 34.6, "words": 104, "wpm": 180, "pauses": 6, "pauses_per_min": 10.4, "long_pauses": 0, "longest_pause_s": 0.36, "pause_share": 0.06, "pitch_median_hz": 190, "pitch_spread_semitones": 4.4, "analysis_ms": 204}
+{"take": "paced.wav", "duration_s": 52.9, "words": 104, "wpm": 118, "pauses": 9, "pauses_per_min": 10.2, "long_pauses": 0, "longest_pause_s": 1.18, "pause_share": 0.18, "pitch_median_hz": 190, "pitch_spread_semitones": 4.4, "analysis_ms": 303}

@@ -1,0 +1,353 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Vox Design System</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Onest:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column of specimens; the app's own dark world is the page itself. */
+:root {
+  color-scheme: dark;
+  --bg: #121614; --surface: #1A1F1C; --fill: #222925; --fillStrong: #2E3632; --line: #2A322D;
+  --ink: #EEF0EA; --ink2: #A7B0AA; --ink3: #6E7872;
+  --accent: #4FC3A9; --onAccent: #08221C; --accentSoft: #173A32;
+  --positive: #8FD47A; --negative: #F08A7E;
+  --face: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --onest: "Onest", "Segoe UI", system-ui, sans-serif;
+  --r-card: 28px; --r-chip: 20px; --r-pill: 999px;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--face); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 48px 80px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 64px; }
+h1 { font-family: var(--serif); font-size: 48px; font-weight: 400; line-height: 1.05; margin: 0; text-wrap: balance; }
+h1 em { color: var(--accent); }
+h2 { font-size: 20px; font-weight: 600; margin: 0 0 6px; }
+.lede { color: var(--ink2); max-width: 62ch; margin: 12px 0 0; }
+.sub { color: var(--ink2); font-size: 14px; margin: 0 0 24px; max-width: 65ch; }
+code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--onAccent); background: var(--accent); border-radius: var(--r-pill); padding: 2px 8px; vertical-align: middle; }
+.tag.q { background: var(--fillStrong); color: var(--ink2); }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.sw { border-radius: var(--r-chip); overflow: hidden; background: var(--surface); border: 1px solid var(--line); }
+.sw .chip { height: 56px; }
+.sw .meta { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 2px; }
+.sw .meta b { font-weight: 600; font-size: 14px; }
+.sw .meta span { color: var(--ink2); font-size: 12px; }
+.contrast { margin-top: 12px; font-size: 13px; color: var(--ink2); display: flex; flex-wrap: wrap; gap: 6px 20px; font-variant-numeric: tabular-nums; }
+.contrast b { color: var(--ink); font-weight: 600; }
+
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+.opt { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.opt.pick { border-color: rgba(79,195,169,.55); }
+.opt header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.opt header b { font-size: 15px; font-weight: 600; }
+.opt .why { font-size: 13px; color: var(--ink2); margin: 0; }
+.spec { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 14px; }
+
+.scale { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.row .tk { color: var(--ink2); font-size: 12px; }
+.row .tk b { color: var(--ink); font-weight: 600; display: block; font-size: 14px; font-family: var(--face); }
+.row > div:last-child { min-width: 0; }
+
+.radii { display: flex; flex-wrap: wrap; gap: 16px; }
+.rad { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.rad .box { width: 132px; height: 84px; background: var(--fill); border: 1px solid var(--fillStrong); }
+.rad span { font-size: 12px; color: var(--ink2); }
+.rad b { color: var(--ink); font-weight: 600; }
+
+.phones { display: flex; flex-wrap: wrap; gap: 24px; }
+.phone-col { display: flex; flex-direction: column; gap: 10px; flex: 1 1 280px; max-width: 330px; }
+.phone-col > span { font-size: 12px; color: var(--ink2); }
+.phone { aspect-ratio: 9 / 19; max-width: 100%; background: var(--bg); border: 1px solid var(--fillStrong); border-radius: 40px;
+  padding: 48px 20px 20px; display: flex; flex-direction: column; overflow: hidden; }
+.bar { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+.bar .t { font-family: var(--serif); font-size: 26px; font-weight: 400; }
+.ico { width: 22px; height: 22px; color: var(--ink2); }
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; padding: 0 24px;
+  border-radius: var(--r-pill); background: var(--accent); color: var(--onAccent); font-weight: 600; font-size: 16px; border: 0; font-family: inherit; }
+.center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 0 8px; }
+.center .tt { font-size: 20px; font-weight: 600; }
+.center .bd { font-size: 14px; color: var(--ink2); max-width: 26ch; }
+.bub { max-width: 82%; padding: 12px 16px; border-radius: var(--r-chip); font-size: 15px; line-height: 1.45; }
+.bub.me { align-self: flex-end; background: var(--accentSoft); }
+.bub.it { align-self: flex-start; background: var(--fill); }
+.msgs { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; padding-bottom: 12px; }
+.field { display: flex; align-items: center; gap: 8px; }
+.field .in { flex: 1; height: 56px; background: var(--fill); border-radius: var(--r-pill); display: flex; align-items: center; padding: 0 20px; color: var(--ink3); font-size: 16px; }
+.send { width: 44px; height: 44px; display: grid; place-items: center; color: var(--accent); }
+
+.tiles { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.tile { border-radius: 16px; padding: 14px; display: flex; gap: 12px; align-items: flex-end; }
+.tile.light { background: #E9ECEF; } .tile.dark { background: #050606; }
+.i29 { width: 29px; height: 29px; border-radius: 7px; display: block; }
+.i60 { width: 60px; height: 60px; border-radius: 14px; display: block; }
+.big { width: 120px; height: 120px; border-radius: 27px; display: block; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.rule { background: var(--surface); border-radius: var(--r-chip); padding: 16px 18px; font-size: 14px; color: var(--ink2); }
+.rule b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 4px; font-size: 15px; }
+.call { padding-top: 40px; }
+.call .top { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.call .top .who { font-family: var(--serif); font-size: 24px; }
+.call .top .tm { font-size: 12px; font-weight: 500; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.stage { flex: 1; display: grid; place-items: center; }
+.pres { position: relative; width: 120px; height: 120px; display: grid; place-items: center; }
+.pres .dot { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); position: relative; z-index: 1; }
+.pres .halo { position: absolute; inset: 0; border-radius: 50%; background: var(--accent); opacity: .14; animation: halo 1.6s ease-out infinite; }
+.pres .halo.h2 { animation-delay: .8s; }
+.pres.listen .dot { background: transparent; border: 2px solid var(--accent); }
+.pres.listen .halo { background: var(--ink); animation-duration: 2.4s; }
+.pres.think .dot { animation: breathe 2.4s ease-in-out infinite; }
+.pres.think .halo { display: none; }
+@keyframes halo { from { transform: scale(.47); opacity: .3; } to { transform: scale(1); opacity: 0; } }
+@keyframes breathe { 50% { transform: scale(.82); opacity: .7; } }
+@media (prefers-reduced-motion: reduce) { .pres .halo, .pres .dot { animation: none !important; } }
+.state { font-size: 12px; font-weight: 500; color: var(--ink2); text-align: center; }
+.states { display: flex; flex-wrap: wrap; gap: 16px; }
+.states > div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 20px 24px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1 1 160px; }
+.states p { margin: 0; font-size: 13px; color: var(--ink2); text-align: center; max-width: 24ch; }
+.cap { text-align: center; display: flex; flex-direction: column; gap: 6px; padding: 0 4px 24px; }
+.cap .prev { font-size: 14px; color: var(--ink3); }
+.cap .now { font-size: 17px; line-height: 1.4; }
+.ctrls { display: flex; justify-content: center; gap: 20px; padding-bottom: 8px; }
+.cb { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--fillStrong); color: var(--ink); }
+.cb.end { background: var(--negative); color: #2A0B07; }
+.call-wrap { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.call-wrap .notes { flex: 1 1 300px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; gap: 4px; } h1 { font-size: 38px; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Glyph outlines are Instrument Serif Italic, converted to paths: the icon needs no font. -->
+    <symbol id="m1" viewBox="0 0 64 64">
+      <rect width="64" height="64" fill="#121614"/>
+      <g transform="translate(-1.6 0)"><path fill="#EEF0EA" d="M26.40 46.00Q23.79 46.00 22.51 44.03Q21.23 42.05 22.03 38.96L26.13 23.55Q26.83 21.04 25.28 21.04Q24.16 21.04 23.07 22.64Q21.97 24.24 20.69 27.87Q20.48 28.51 19.95 28.51Q19.68 28.51 19.52 28.27Q19.36 28.03 19.47 27.65Q22.56 18.00 27.20 18.00Q29.01 18.00 29.65 19.49Q30.29 20.99 29.60 23.60L25.39 39.49Q24.80 41.73 25.31 42.93Q25.81 44.13 27.15 44.13Q28.69 44.13 30.43 42.64Q32.16 41.15 33.71 38.75Q35.25 36.35 36.21 33.47Q37.17 30.59 37.17 27.81Q37.17 25.57 36.69 24.27Q36.21 22.96 35.71 22.05Q35.20 21.15 35.20 20.08Q35.20 18.00 37.01 18.00Q39.57 18.00 39.57 23.65Q39.57 27.71 38.40 31.68Q37.23 35.65 35.31 38.88Q33.39 42.11 31.07 44.05Q28.75 46.00 26.40 46.00Z"/><circle cx="45" cy="43.6" r="2.5" fill="#4FC3A9"/></g>
+    </symbol>
+    <symbol id="m2" viewBox="0 0 64 64">
+      <rect width="64" height="64" fill="#4FC3A9"/>
+      <path fill="#08221C" d="M28.68 48.00Q25.88 48.00 24.51 45.89Q23.14 43.77 23.99 40.46L28.39 23.94Q29.14 21.26 27.48 21.26Q26.28 21.26 25.11 22.97Q23.94 24.69 22.57 28.57Q22.34 29.26 21.77 29.26Q21.48 29.26 21.31 29.00Q21.14 28.74 21.25 28.34Q24.57 18.00 29.54 18.00Q31.48 18.00 32.17 19.60Q32.85 21.20 32.11 24.00L27.59 41.03Q26.97 43.43 27.51 44.71Q28.05 46.00 29.48 46.00Q31.14 46.00 32.99 44.40Q34.85 42.80 36.51 40.23Q38.17 37.66 39.19 34.57Q40.22 31.49 40.22 28.51Q40.22 26.11 39.71 24.71Q39.19 23.31 38.65 22.34Q38.11 21.37 38.11 20.23Q38.11 18.00 40.05 18.00Q42.79 18.00 42.79 24.06Q42.79 28.40 41.54 32.66Q40.28 36.91 38.22 40.37Q36.17 43.83 33.68 45.91Q31.19 48.00 28.68 48.00Z"/>
+    </symbol>
+    <symbol id="m3" viewBox="0 0 64 64">
+      <rect width="64" height="64" fill="#121614"/>
+      <path fill="#EEF0EA" d="M18.60 38.97Q17.29 38.97 16.65 37.99Q16.01 37.00 16.41 35.46L18.46 27.77Q18.81 26.52 18.04 26.52Q17.48 26.52 16.93 27.32Q16.39 28.11 15.75 29.92Q15.64 30.24 15.38 30.24Q15.24 30.24 15.16 30.12Q15.08 30.00 15.14 29.82Q16.68 25.00 19.00 25.00Q19.90 25.00 20.22 25.75Q20.54 26.49 20.19 27.79L18.09 35.73Q17.80 36.84 18.05 37.44Q18.30 38.04 18.97 38.04Q19.74 38.04 20.61 37.30Q21.47 36.55 22.24 35.35Q23.01 34.16 23.49 32.72Q23.97 31.28 23.97 29.90Q23.97 28.78 23.73 28.13Q23.49 27.48 23.24 27.02Q22.99 26.57 22.99 26.04Q22.99 25.00 23.89 25.00Q25.17 25.00 25.17 27.82Q25.17 29.84 24.58 31.83Q24.00 33.81 23.04 35.42Q22.08 37.03 20.93 38.00Q19.77 38.97 18.60 38.97ZM29.64 38.97Q27.99 38.97 27.03 37.60Q26.08 36.23 26.08 33.89Q26.08 32.16 26.63 30.56Q27.19 28.97 28.11 27.71Q29.03 26.46 30.16 25.73Q31.29 25.00 32.44 25.00Q34.09 25.00 35.04 26.36Q36.00 27.71 36.00 30.08Q36.00 31.81 35.44 33.41Q34.89 35.01 33.97 36.26Q33.05 37.51 31.92 38.24Q30.79 38.97 29.64 38.97ZM29.59 38.33Q30.44 38.33 31.25 37.51Q32.06 36.68 32.73 35.33Q33.39 33.97 33.79 32.31Q34.19 30.64 34.19 28.97Q34.19 25.64 32.46 25.64Q31.64 25.64 30.81 26.45Q29.99 27.26 29.34 28.62Q28.68 29.98 28.28 31.64Q27.89 33.30 27.89 34.98Q27.89 38.33 29.59 38.33ZM37.44 39.00Q36.70 39.00 36.31 38.59Q35.92 38.17 35.92 37.51Q35.92 36.90 36.23 36.50Q36.54 36.10 37.04 36.10Q37.47 36.10 37.67 36.31Q37.87 36.52 37.97 36.80Q38.08 37.08 38.21 37.30Q38.35 37.51 38.64 37.51Q39.30 37.51 40.06 36.07Q40.82 34.63 41.51 32.40Q41.65 32.03 41.67 31.73Q41.70 31.44 41.67 31.07L41.46 27.77Q41.43 27.08 41.22 26.80Q41.01 26.52 40.69 26.52Q40.10 26.52 39.57 27.22Q39.04 27.93 38.69 29.90Q38.61 30.24 38.35 30.24Q37.97 30.24 38.05 29.76Q38.37 27.93 38.94 26.89Q39.52 25.85 40.17 25.43Q40.82 25.00 41.38 25.00Q42.20 25.00 42.67 25.57Q43.14 26.14 43.22 27.53L43.30 28.78Q43.32 28.94 43.44 28.95Q43.56 28.97 43.64 28.81Q44.60 26.70 45.49 25.85Q46.38 25.00 47.37 25.00Q48.11 25.00 48.50 25.41Q48.89 25.83 48.89 26.49Q48.89 27.10 48.59 27.50Q48.30 27.90 47.77 27.90Q47.34 27.90 47.14 27.69Q46.94 27.48 46.84 27.20Q46.73 26.92 46.61 26.70Q46.49 26.49 46.22 26.49Q45.82 26.49 45.32 27.09Q44.81 27.69 44.36 28.67Q43.91 29.66 43.62 30.86Q43.54 31.23 43.52 31.52Q43.51 31.81 43.54 32.19L43.77 36.07Q43.83 36.90 44.07 37.24Q44.31 37.59 44.71 37.59Q45.21 37.59 45.74 36.83Q46.28 36.07 46.62 34.10Q46.70 33.76 47.00 33.76Q47.31 33.76 47.26 34.24Q47.02 36.05 46.50 37.08Q45.98 38.12 45.37 38.55Q44.76 38.97 44.20 38.97Q43.22 38.97 42.68 38.35Q42.15 37.72 42.04 36.21L41.91 34.21Q41.89 34.02 41.78 34.02Q41.67 34.02 41.59 34.18L41.11 35.35Q39.60 39.00 37.44 39.00Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <h1>Vox, take <em>two</em></h1>
+    <p class="lede">The palette stays as you approved it. The type and the mark are new: quieter, drawn from real faces instead of invented shapes. Each has options side by side, with the one I'd pick marked. The screens further down use those picks.</p>
+  </header>
+
+  <section>
+    <h2>Colour · <code>AppColors</code> <span class="tag q">kept</span></h2>
+    <p class="sub">Unchanged from the first version.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#121614"></div><div class="meta"><b>bg</b><span>#121614</span></div></div>
+      <div class="sw"><div class="chip" style="background:#1A1F1C"></div><div class="meta"><b>surface</b><span>#1A1F1C</span></div></div>
+      <div class="sw"><div class="chip" style="background:#222925"></div><div class="meta"><b>fill</b><span>#222925</span></div></div>
+      <div class="sw"><div class="chip" style="background:#2E3632"></div><div class="meta"><b>fillStrong</b><span>#2E3632</span></div></div>
+      <div class="sw"><div class="chip" style="background:#2A322D"></div><div class="meta"><b>line</b><span>#2A322D</span></div></div>
+      <div class="sw"><div class="chip" style="background:#EEF0EA"></div><div class="meta"><b>ink</b><span>#EEF0EA</span></div></div>
+      <div class="sw"><div class="chip" style="background:#A7B0AA"></div><div class="meta"><b>ink2</b><span>#A7B0AA</span></div></div>
+      <div class="sw"><div class="chip" style="background:#6E7872"></div><div class="meta"><b>ink3</b><span>#6E7872</span></div></div>
+      <div class="sw"><div class="chip" style="background:#4FC3A9"></div><div class="meta"><b>accent</b><span>#4FC3A9</span></div></div>
+      <div class="sw"><div class="chip" style="background:#08221C"></div><div class="meta"><b>onAccent</b><span>#08221C</span></div></div>
+      <div class="sw"><div class="chip" style="background:#173A32"></div><div class="meta"><b>accentSoft</b><span>#173A32</span></div></div>
+      <div class="sw"><div class="chip" style="background:#8FD47A"></div><div class="meta"><b>positive</b><span>#8FD47A</span></div></div>
+      <div class="sw"><div class="chip" style="background:#F08A7E"></div><div class="meta"><b>negative</b><span>#F08A7E</span></div></div>
+    </div>
+    <div class="contrast"><span>ink / bg <b>15.89</b></span><span>ink2 / bg <b>8.20</b></span><span>onAccent / accent <b>7.73</b></span><span>ink / accentSoft <b>10.84</b></span><span>ink3 / bg <b>3.99</b> (placeholders only)</span></div>
+  </section>
+
+  <section>
+    <h2>Type, three ways</h2>
+    <p class="sub">All three are on Google Fonts. Instrument Sans is a calm grotesque with slightly narrow, crisp shapes. Instrument Serif comes from the same studio and is drawn to sit next to it, so a serif for the big moments doesn't clash with the sans.</p>
+    <div class="opts">
+      <div class="opt pick">
+        <header><b>A · Instrument Sans + Serif</b><span class="tag">my pick</span></header>
+        <p class="why">The sans everywhere; the serif only for <code>display</code> and <code>headline</code>, which means the greeting, the app name and screen titles. That's where the warmth comes from, and it stays quiet everywhere else.</p>
+        <div class="spec">
+          <div style="font-family:var(--serif);font-size:34px;line-height:1.1">Olá, Pietro</div>
+          <div style="font-size:20px;font-weight:600">Vogais abertas</div>
+          <div style="font-size:15px">Leia o trecho em voz alta, devagar, marcando cada sílaba tônica.</div>
+          <div style="font-size:13px;color:var(--ink2)">3 minutos · respiração diafragmática</div>
+        </div>
+      </div>
+      <div class="opt">
+        <header><b>B · Instrument Sans alone</b></header>
+        <p class="why">One face, with the hierarchy carried by weight. The most discreet of the three, and a little plainer.</p>
+        <div class="spec">
+          <div style="font-size:32px;font-weight:500;letter-spacing:-0.02em;line-height:1.1">Olá, Pietro</div>
+          <div style="font-size:20px;font-weight:600">Vogais abertas</div>
+          <div style="font-size:15px">Leia o trecho em voz alta, devagar, marcando cada sílaba tônica.</div>
+          <div style="font-size:13px;color:var(--ink2)">3 minutos · respiração diafragmática</div>
+        </div>
+      </div>
+      <div class="opt" style="font-family:var(--onest)">
+        <header><b>C · Onest</b><span class="tag q">as on Lunna</span></header>
+        <p class="why">Your fallback. Soft and very legible, with Cyrillic roots. Vox would look like a sibling of Lunna.</p>
+        <div class="spec">
+          <div style="font-size:32px;font-weight:500;letter-spacing:-0.02em;line-height:1.1">Olá, Pietro</div>
+          <div style="font-size:20px;font-weight:600">Vogais abertas</div>
+          <div style="font-size:15px">Leia o trecho em voz alta, devagar, marcando cada sílaba tônica.</div>
+          <div style="font-size:13px;color:var(--ink2)">3 minutos · respiração diafragmática</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Scale with option A · <code>AppTypography</code></h2>
+    <p class="sub">Same method names and sizes. <code>face()</code> becomes Instrument Sans, and a second method, <code>serif()</code>, serves only the two largest styles.</p>
+    <div class="scale">
+      <div class="row"><div class="tk"><b>display</b>Serif 44 / 400 · 1.05</div><div style="font-family:var(--serif);font-size:44px;line-height:1.05">Respire fundo</div></div>
+      <div class="row"><div class="tk"><b>headline</b>Serif 32 / 400 · 1.1</div><div style="font-family:var(--serif);font-size:32px;line-height:1.1">Aquecimento vocal</div></div>
+      <div class="row"><div class="tk"><b>title</b>Sans 20 / 600 · 1.2</div><div style="font-size:20px;font-weight:600;line-height:1.2">Vogais abertas</div></div>
+      <div class="row"><div class="tk"><b>body</b>Sans 16 / 400 · 1.5</div><div style="font-size:16px">Leia o trecho em voz alta, devagar, marcando cada sílaba tônica.</div></div>
+      <div class="row"><div class="tk"><b>bodyStrong</b>Sans 16 / 600 · 1.25</div><div style="font-size:16px;font-weight:600;line-height:1.25">Começar exercício</div></div>
+      <div class="row"><div class="tk"><b>label</b>Sans 14 / 400 · ink2</div><div style="font-size:14px;color:var(--ink2)">3 minutos · respiração diafragmática</div></div>
+      <div class="row"><div class="tk"><b>labelStrong</b>Sans 14 / 600</div><div style="font-size:14px;font-weight:600">Articulação</div></div>
+      <div class="row"><div class="tk"><b>caption</b>Sans 12 / 500 · ink2</div><div style="font-size:12px;font-weight:500;color:var(--ink2)">Hoje, 08:30</div></div>
+    </div>
+    <p class="sub" style="margin-top:12px">Display sizes go up a step because a serif at 400 reads lighter than a sans at the same size.</p>
+  </section>
+
+  <section>
+    <h2>The mark, three ways</h2>
+    <p class="sub">Each is a letterform from Instrument Serif Italic, converted to outlines so the icon doesn't depend on the font. Every option is shown at 29 and 60pt on a light home screen and a dark one.</p>
+    <div class="opts">
+      <div class="opt pick">
+        <header><b>1 · v, and a breath</b><span class="tag">my pick</span></header>
+        <p class="why">An off-white italic v on the page colour, with one small teal dot like a held note or a full stop. The only colour is the dot, so it's a quiet icon on a busy home screen. The dark tile has a soft edge against black, so the glyph itself has to carry it.</p>
+        <div class="tiles">
+          <div class="tile light"><svg class="i29"><use href="#m1"/></svg><svg class="i60"><use href="#m1"/></svg></div>
+          <div class="tile dark"><svg class="i29"><use href="#m1"/></svg><svg class="i60"><use href="#m1"/></svg></div>
+        </div>
+        <svg class="big"><use href="#m1"/></svg>
+      </div>
+      <div class="opt">
+        <header><b>2 · v on teal</b></header>
+        <p class="why">The same v, dark on the accent. It's the easiest to find on any home screen, and louder than option 1.</p>
+        <div class="tiles">
+          <div class="tile light"><svg class="i29"><use href="#m2"/></svg><svg class="i60"><use href="#m2"/></svg></div>
+          <div class="tile dark"><svg class="i29"><use href="#m2"/></svg><svg class="i60"><use href="#m2"/></svg></div>
+        </div>
+        <svg class="big"><use href="#m2"/></svg>
+      </div>
+      <div class="opt">
+        <header><b>3 · vox, the word</b></header>
+        <p class="why">The whole name as a wordmark. Charming at 120pt, but at 29pt the o and x crowd together, so this one is better as the sign-in wordmark than as the icon.</p>
+        <div class="tiles">
+          <div class="tile light"><svg class="i29"><use href="#m3"/></svg><svg class="i60"><use href="#m3"/></svg></div>
+          <div class="tile dark"><svg class="i29"><use href="#m3"/></svg><svg class="i60"><use href="#m3"/></svg></div>
+        </div>
+        <svg class="big"><use href="#m3"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Shape · <code>AppSpacing</code> <span class="tag q">kept</span></h2>
+    <p class="sub">The same as the first version.</p>
+    <div class="radii">
+      <div class="rad"><div class="box" style="border-radius:28px"></div><span><b>cardRadius</b> 28</span></div>
+      <div class="rad"><div class="box" style="border-radius:20px"></div><span><b>chipRadius</b> 20 · bubbles, menus</span></div>
+      <div class="rad"><div class="box" style="border-radius:999px;height:52px"></div><span><b>buttonRadius</b> pill · <b>buttonHeight</b> 52</span></div>
+      <div class="rad"><div class="box" style="border-radius:999px;height:56px;width:180px"></div><span><b>fieldHeight</b> 56, pill</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Screens, with A and 1</h2>
+    <p class="sub">The three screens the app has today. Their layouts and copy stay as they are.</p>
+    <div class="phones">
+      <div class="phone-col"><span>Sign in</span>
+        <div class="phone">
+          <div class="center" style="gap:20px">
+            <svg width="112" height="112" style="border-radius:26px;border:1px solid var(--line)"><use href="#m1"/></svg>
+            <div style="font-family:var(--serif);font-size:32px;line-height:1.1">Vox</div>
+          </div>
+          <button class="btn" type="button" style="margin-bottom:32px">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3Z"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z" opacity=".75"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14Z" opacity=".55"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.7 9.4 6 12 6Z" opacity=".9"/></svg>
+            Entrar com Google</button>
+        </div>
+      </div>
+      <div class="phone-col"><span>Home, empty</span>
+        <div class="phone">
+          <div class="bar"><span class="t">Olá, Pietro</span>
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
+          <div class="center">
+            <div class="tt">Tudo pronto</div>
+            <div class="bd">Esta tela está em branco. É aqui que o app começa.</div>
+            <button class="btn" type="button" style="margin-top:16px">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Falar com o assistente</button>
+          </div>
+        </div>
+      </div>
+      <div class="phone-col"><span>Assistant</span>
+        <div class="phone">
+          <div class="bar"><span class="t" style="display:flex;align-items:center;gap:10px">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="color:var(--ink)"><path d="M15 18l-6-6 6-6"/></svg>Assistente</span></div>
+          <div class="msgs">
+            <div class="bub me">Como aqueço a voz antes de uma apresentação?</div>
+            <div class="bub it">Comece com cinco respirações lentas pelo diafragma. Depois, faça vibração de lábios subindo e descendo a escala, por um minuto.</div>
+            <div class="bub me">E se eu tiver só dois minutos?</div>
+            <div class="bub it">Fique só com a vibração de lábios. Ela aquece e relaxa ao mesmo tempo.</div>
+          </div>
+          <div class="field"><div class="in">Pergunte qualquer coisa</div>
+            <div class="send"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The call</h2>
+    <p class="sub">Vox is mostly a voice call with the agent, so the call screen is the heart of the app. The dot from the mark becomes the agent's presence: it's what you look at while you talk. Teal stays a state colour, meaning the agent is here and alive. There's no avatar and no face, just a voice made visible. The text chat stays as the quiet fallback.</p>
+    <div class="states">
+      <div><div class="pres listen"><span class="halo"></span><span class="halo h2"></span><span class="dot"></span></div><span class="state">Ouvindo</span><p>A hollow ring. A faint halo follows your voice, so you can see you're being heard.</p></div>
+      <div><div class="pres think"><span class="dot"></span></div><span class="state">Pensando</span><p>The dot breathes slowly. Nothing else moves.</p></div>
+      <div><div class="pres"><span class="halo"></span><span class="halo h2"></span><span class="dot"></span></div><span class="state">Falando</span><p>Filled, with teal rings that swell with the agent's voice.</p></div>
+    </div>
+    <div class="call-wrap" style="margin-top:24px">
+      <div class="phone-col"><span>In a call</span>
+        <div class="phone call">
+          <div class="top"><span class="who">Assistente</span><span class="tm">04:12</span></div>
+          <div class="stage"><div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div class="pres"><span class="halo"></span><span class="halo h2"></span><span class="dot"></span></div><span class="state">Falando</span></div></div>
+          <div class="cap">
+            <span class="prev">Boa, agora mais devagar.</span>
+            <span class="now">Repita comigo: o rato roeu a roupa do rei de Roma.</span>
+          </div>
+          <div class="ctrls">
+            <div class="cb" title="Microfone"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+            <div class="cb" title="Legendas"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 12h4M13 12h4M7 15h7"/></svg></div>
+            <div class="cb end" title="Encerrar"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 9c-3.1 0-6 .9-8.3 2.5-.7.5-.9 1.4-.5 2.1l1 1.7c.4.7 1.3 1 2 .6l2.1-1c.6-.3.9-.9.9-1.5v-1.6a12 12 0 0 1 5.6 0v1.6c0 .6.3 1.2.9 1.5l2.1 1c.7.4 1.6.1 2-.6l1-1.7c.4-.7.2-1.6-.5-2.1A14.6 14.6 0 0 0 12 9Z"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="notes">
+        <div class="rule"><b>Live captions</b>What the agent is saying right now is in <code>body</code> at full ink. The line before fades to <code>ink3</code>, so captions read as speech going by, not as a transcript. You can turn them off.</div>
+        <div class="rule"><b>Controls</b>Three round 64pt buttons, the size you can hit without looking. Mic and captions use <code>fillStrong</code>. Hanging up is the one red thing on the screen.</div>
+        <div class="rule"><b>New tokens</b><code>AppColors.onNegative</code> #2A0B07, what's drawn on <code>negative</code> (7.52:1). <code>AppSpacing.callControl</code> 64 and <code>AppSpacing.presence</code> 120. The call screen itself gets built later with <code>/create</code>; this only gives it its vocabulary.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Also changes</h2>
+    <div class="rules">
+      <div class="rule"><b>Theme</b><code>AppBrand.brightness</code> becomes dark; status bar icons turn light.</div>
+      <div class="rule"><b>Icon and splash</b>With mark 1, the icon background and the splash are both #121614. The splash is the mark alone, no tile.</div>
+      <div class="rule"><b>Web</b>Background and theme colour #121614; status bar <code>black-translucent</code>.</div>
+      <div class="rule"><b>Fonts</b>Through <code>google_fonts</code>, as today. The icon is outlines, so it ships no font.</div>
+    </div>
+  </section>
+</div>
+
+</body></html>

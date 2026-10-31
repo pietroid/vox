@@ -18,6 +18,11 @@ RFCs: [voice pipeline](2026-10-30-voice-pipeline/README.md).
   sentence by sentence and cover a known wait with a fixed phrase. Read:
   [ElevenLabs latency guide](https://elevenlabs.io/blog/voice-agent-latency-optimization).
   Met in: [voice pipeline](2026-10-30-voice-pipeline/README.md).
+- **Turn detection is a mode, not a constant.** A call ends a turn at a
+  pause; a rehearsal's pauses are part of the talk, so a talk is ended by
+  the speaker and the detector only runs in conversation. Read:
+  [Deepgram Flux](https://developers.deepgram.com/docs/models-languages-overview).
+  Met in: [voice pipeline](2026-10-30-voice-pipeline/README.md).
 
 ## Agents
 

@@ -8,6 +8,11 @@ A session (the assumptions, change them here):
 Prices, USD, read 2026-10-30 (see the RFC's Go deeper for the pages):
   Groq whisper-large-v3-turbo $0.04/h (10 s minimum per request)
   Deepgram Nova-3 multilingual pre-recorded $0.0052/min, Aura-2 $0.030/1k chars
+    (Aura-2 has no Portuguese voice; read 2026-10-31)
+  Deepgram streaming, read 2026-10-31: Flux STT multilingual $0.0078/min,
+    Flux TTS $0.045/1k chars (the only Deepgram TTS with pt-BR voices).
+    The mic stream stays open the whole session (so the person can cut in),
+    so STT bills the agent's speaking time too.
   OpenAI gpt-4o-mini-transcribe ~$0.003/min, gpt-4o-mini-tts ~$0.015/min
   Gemini 3.5 Flash-Lite: $0.30/M audio in, 32 tokens/s; Flash-Lite TTS
     $6/M audio out (to 2026-12-31), assumed 32 tokens/s too
@@ -44,11 +49,12 @@ def llm(cached: bool) -> float:
 pipelines = [
     # name, stt, tts, llm, note
     ("Phone STT + phone TTS", 0.0, 0.0, llm(True), "breaks on long talks"),
-    ("Groq Whisper + phone TTS", max(SPEAK_MIN, TURNS * 10 / 60) * 0.04 / 60, 0.0, llm(True), "recommended"),
+    ("Groq Whisper + phone TTS", max(SPEAK_MIN, TURNS * 10 / 60) * 0.04 / 60, 0.0, llm(True), "cheapest with timings"),
     ("Groq Whisper + Gemini TTS", SPEAK_MIN * 0.04 / 60, AGENT_MIN * 60 * 32 * 6e-6, llm(True), "nicer voice"),
     ("Gemini hears audio + TTS", SPEAK_MIN * 60 * 32 * 0.30e-6, AGENT_MIN * 60 * 32 * 6e-6, llm(True), "no word timings"),
     ("OpenAI mini STT + TTS", SPEAK_MIN * 0.003, AGENT_MIN * 0.015, llm(True), ""),
-    ("Deepgram Nova-3 + Aura-2", SPEAK_MIN * 0.0052, AGENT_CHARS / 1000 * 0.030, llm(True), ""),
+    ("Deepgram Flux STT + Flux TTS", (SPEAK_MIN + AGENT_MIN) * 0.0078, AGENT_CHARS / 1000 * 0.045, llm(True), "chosen 2026-10-31"),
+    ("Deepgram Flux STT + phone TTS", (SPEAK_MIN + AGENT_MIN) * 0.0078, 0.0, llm(True), "fallback voice"),
     ("Realtime speech-to-speech", SPEAK_MIN * 0.06, AGENT_MIN * 0.24, 0.0, "estimate"),
 ]
 
@@ -88,7 +94,7 @@ names = [r["pipeline"] for r in rows][::-1]
 vals = [r["session_usd"] * 100 for r in rows][::-1]  # cents
 fig, ax = plt.subplots(figsize=(7.8, 4.4), facecolor=bg)
 ax.set_facecolor(bg)
-colors = [accent if n == "Groq Whisper + phone TTS" else second for n in names]
+colors = [accent if n == "Deepgram Flux STT + Flux TTS" else second for n in names]
 ax.barh(names, vals, color=colors, height=0.6)
 for y, v in enumerate(vals):
     ax.text(v * 1.15, y, f"{v:.2f}¢", va="center", color=fg, fontsize=10)

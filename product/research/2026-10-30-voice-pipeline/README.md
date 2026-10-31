@@ -36,9 +36,16 @@ flowchart TD
 > directions; Groq Whisper and the upload-per-turn protocol are dropped.
 
 > **Note:** "Also consider this for the build phase:
-> [the linked artifact](https://claude.ai/artifact/4McqUkEo4Y5hjGMjS9h5Gh)". This run could not
-> open it (the artifact is not shared with this account). It is carried
-> into the build issue as an input; see *Decided unattended*.
+> [the linked artifact](https://claude.ai/artifact/4McqUkEo4Y5hjGMjS9h5Gh)".
+> Then (2026-10-31): "I have put the artifact inside the local repository
+> on the machine as html".
+>
+> **A:** Read it: *Vox Design System*, take two, with the call screen
+> designed. It is copied into this RFC as
+> [`data/vox-design-system.html`](data/vox-design-system.html) so the build
+> reads it from the repo. Two new slides follow
+> [*End of turn*](#end-of-turn-is-a-calls-feature-and-a-rehearsals-trap):
+> the screen, and the pipeline signal behind each thing on it.
 
 ## Today the assistant is text-only, blocking, and capped at 4 minutes
 
@@ -145,6 +152,38 @@ flowchart TD
   "hum" are still found as voiced time with no word, from loudness ×
   timestamps.
 
+## The call screen is designed: a dot, captions, three buttons
+
+![The call screen from the design-system artifact: the agent's presence as a dot in three states (Ouvindo, Pensando, Falando), live captions of the agent's current sentence, and three round buttons: mic, captions, hang up](img/call-design.png)
+
+From [the artifact](data/vox-design-system.html) (rendered by
+[`code/shot_call.py`](code/shot_call.py)):
+
+- **Ouvindo:** a hollow ring; a halo follows *your* voice.
+- **Pensando:** the dot breathes; nothing else moves.
+- **Falando:** filled; rings swell with the agent's voice.
+- **Captions:** the agent's current sentence at full ink, the one before
+  faded. The text chat stays as the quiet fallback.
+
+## Every part of the screen is a signal the pipeline already has
+
+| On screen | Signal | Where it comes from |
+|---|---|---|
+| Ouvindo | turn started | Flux STT start-of-turn, relayed as `state` |
+| Pensando | end of turn → first audio | Flux end-of-turn (or *Terminei*), until TTS starts |
+| Falando | audio playing | the phone's player; back to Ouvindo when it drains |
+| Halo / rings | loudness, ~20×/s | RMS of the PCM the phone records / plays: local, no round trip |
+| Caption line | the sentence sent to TTS | the server sends `{caption}` with its audio |
+| Mic button | mute | stop sending PCM; server sends Flux keep-alives |
+| Hang up | end of session | close socket → both Deepgram sockets closed, cost logged |
+
+Sentence-by-sentence TTS makes captions free: the text exists before its
+audio. The design has **no button to end a Talk**; the recommendation is
+a *Terminei* pill in the caption area, empty while the person speaks.
+
+**The screen's states are the pipeline's events:** one `state` message,
+one `caption`, levels on the phone; nothing is inferred twice.
+
 ## Speak the first sentence, not the whole answer
 
 | Step after the person stops | Short answer | Whole talk (4 min) |
@@ -188,11 +227,13 @@ flowchart TD
 > **Precompute what you can predict.** Questions about known material are
 > known before the talk starts. *For us:* one plan call per session.
 
-## The change: six pieces, mostly on existing seams
+## The change: eight pieces, mostly on existing seams
 
 | Piece | Where | Size |
 |---|---|---|
-| Stream the mic (PCM, echo cancel), play streamed audio, cut in | app: `assistant/` + a recorder and a PCM player | M |
+| Apply the artifact's design system (dark, Instrument Sans/Serif, the mark) | `app_ui`, brand: `/design-system` | S |
+| Call screen: presence states, levels, captions, three controls, *Terminei* | app: `call/`, new tokens `onNegative`, `callControl`, `presence` | M |
+| Stream the mic (PCM, echo cancel), play streamed audio, cut in | app: `call/` + a recorder and a PCM player | M |
 | WebSocket gateway: relay to Flux STT, turns, Talk/Conversation | server: `assistant/voice.gateway.ts` | M |
 | Flux TTS client: sentences in, audio out | server: `assistant/deepgram-tts.ts` | S |
 | Metrics in TypeScript (port of `speech_metrics.py`) | server: `assistant/speech-metrics.ts` | S |
@@ -250,13 +291,22 @@ text, summarised aloud) is the first cost lever.
 | Route to Deepgram | relay via server · phone direct with a temp token | **relay** | direct: no audio for pitch, cost tracked twice |
 | Who ends a talk | button · Flux end-of-turn | **button in Talk, Flux in Conversation** | turn detection cuts long pauses |
 | Keep the audio | discard · store for replay | **discard** | storage, consent, retention |
+| Ending a Talk on the call screen | *Terminei* pill in the caption area · tap the dot · a 4th button | **pill** | the dot: hidden gesture; a 4th button: breaks the three-control design |
+| Design system before the call screen | apply the artifact first · only the call's tokens | **apply it first** | half-restyled app: dark call, light home |
 | Pace norms | own baseline · fixed bands | **own baseline** | pt-BR median ~87 wpm in one vendor's data |
 
 ## Decided unattended
 
-- The linked artifact could not be read (not shared with this account). It
-  is listed as an input for the build; share it, or paste its content into
-  the issue, before the build starts.
+- The artifact was found untracked at the root of the main checkout
+  (`Vox Design System.html`) and copied here as
+  `data/vox-design-system.html`; the original is left where it is.
+- Its call screen has no control to end a Talk: a *Terminei* pill in the
+  caption area is recommended (Decisions).
+- The artifact's palette, type and mark are not applied in the app yet
+  (`AppBrand.brightness` is still light): applying it is the build's first
+  piece, since the call screen draws only with `app_ui`.
+- Muting keeps the Flux socket open with keep-alives rather than closing
+  it; Flux's exact idle timeout is **unverified**.
 - "Separated STT and TTS" read as: two Deepgram calls with our LLM in
   between, not Deepgram's Voice Agent API.
 - Aura-2 replaced by Flux TTS, the only Deepgram TTS with Portuguese.
@@ -275,6 +325,7 @@ text, summarised aloud) is the first cost lever.
 | Time to first audio, not time to answer | stream sentences into Flux TTS; a fixed acknowledgement | [ElevenLabs latency guide](https://elevenlabs.io/blog/voice-agent-latency-optimization) |
 | Precompute what you can predict | one plan call; a cached prefix halves the LLM cost | [`code/session_cost.py`](code/session_cost.py) |
 | Turn detection is a mode, not a constant | a 1.18 s pause inside a talk is not its end | [Flux STT](https://developers.deepgram.com/docs/models-languages-overview) |
+| The screen's states are the pipeline's events | Ouvindo/Pensando/Falando from turn events; captions from TTS sentences | [the artifact](data/vox-design-system.html) |
 
 Sources:
 
@@ -294,4 +345,6 @@ Data and code: [`data/takes.jsonl`](data/takes.jsonl),
 [`code/make_samples.sh`](code/make_samples.sh) →
 [`code/speech_metrics.py`](code/speech_metrics.py),
 [`code/plot_takes.py`](code/plot_takes.py),
-[`code/session_cost.py`](code/session_cost.py) (numpy, matplotlib).
+[`code/session_cost.py`](code/session_cost.py) (numpy, matplotlib);
+the design: [`data/vox-design-system.html`](data/vox-design-system.html) →
+[`code/shot_call.py`](code/shot_call.py) (Chrome, headless).

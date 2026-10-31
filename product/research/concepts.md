@@ -23,6 +23,11 @@ RFCs: [voice pipeline](2026-10-30-voice-pipeline/README.md).
   the speaker and the detector only runs in conversation. Read:
   [Deepgram Flux](https://developers.deepgram.com/docs/models-languages-overview).
   Met in: [voice pipeline](2026-10-30-voice-pipeline/README.md).
+- **The screen's states are the pipeline's events.** A voice UI's states
+  (listening, thinking, speaking) and captions come from turn events and
+  the sentences sent to TTS; levels are measured where the audio is.
+  Nothing is inferred twice. Met in:
+  [voice pipeline](2026-10-30-voice-pipeline/README.md).
 
 ## Agents
 

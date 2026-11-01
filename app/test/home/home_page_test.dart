@@ -75,7 +75,7 @@ void main() {
     verify(auth.signOut).called(1);
   });
 
-  testWidgets('after the first call, the home is the history', (
+  testWidgets('after the first call, the home lists the subjects', (
     tester,
   ) async {
     final auth = _MockAuthRepository();
@@ -94,10 +94,9 @@ void main() {
     await tester.pumpWidget(_home(auth, _FakeHistory([call])));
     await tester.pump();
 
-    expect(find.text('Primeira ligação feita'), findsOneWidget);
-    expect(find.text('Suas ligações'), findsOneWidget);
+    expect(find.text('Seus assuntos'), findsOneWidget);
     expect(find.text('Apresentação do trimestre'), findsOneWidget);
-    expect(find.text('Nova'), findsOneWidget);
+    expect(find.text('Novo assunto'), findsOneWidget);
     expect(find.text('Fazer minha primeira ligação'), findsNothing);
   });
 }

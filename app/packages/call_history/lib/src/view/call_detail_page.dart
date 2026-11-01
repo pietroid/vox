@@ -60,7 +60,13 @@ class CallDetailPage extends StatelessWidget {
                 Wrap(
                   spacing: AppSpacing.s2,
                   runSpacing: AppSpacing.s2,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
+                    AppAvatar(
+                      name: call.coach.label(l10n),
+                      tag: call.coach.language.tag(l10n),
+                      size: AppSpacing.badge + AppSpacing.s1,
+                    ),
                     AppMeta(
                       boxed: true,
                       icon: AppIcons.duration,
@@ -71,12 +77,6 @@ class CallDetailPage extends StatelessWidget {
                       icon: AppIcons.cost,
                       text: context.callCost(call.costUsd),
                     ),
-                    if (call.subjectIndex > 1)
-                      AppMeta(
-                        boxed: true,
-                        icon: AppIcons.followUp,
-                        text: l10n.callSubjectIndex(call.subjectIndex),
-                      ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.s8),
@@ -99,30 +99,30 @@ class CallDetailPage extends StatelessWidget {
                     spacing: AppSpacing.s2,
                     children: [
                       Expanded(
-                        child: _Metric(
+                        child: AppStat(
                           icon: AppIcons.pace,
-                          value: metrics.wordsPerMinute,
+                          value: '${metrics.wordsPerMinute}',
                           label: l10n.metricPace,
                           delta: metrics.wordsPerMinuteDelta,
                         ),
                       ),
                       Expanded(
-                        child: _Metric(
+                        child: AppStat(
                           icon: AppIcons.pauses,
-                          value: metrics.longPauses,
+                          value: '${metrics.longPauses}',
                           label: l10n.metricPauses,
                           delta: metrics.longPausesDelta,
                         ),
                       ),
                       Expanded(
-                        child: _Metric(
+                        child: AppStat(
                           icon: AppIcons.hesitations,
-                          value: metrics.hesitations,
+                          value: '${metrics.hesitations}',
                           label: l10n.metricHesitations,
                           delta: metrics.hesitationsDelta,
                           // The one number with a good direction: pace and
                           // pauses depend on the talk, so they stay neutral.
-                          fewerIsBetter: true,
+                          lowerIsBetter: true,
                         ),
                       ),
                     ],
@@ -140,30 +140,19 @@ class CallDetailPage extends StatelessWidget {
               top: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.s6,
                   AppSpacing.s4,
-                  AppSpacing.s6,
+                  AppSpacing.s4,
+                  AppSpacing.s4,
                   AppSpacing.s4,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      l10n.callFollowUpNote,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.caption,
-                    ),
-                    const SizedBox(height: AppSpacing.s3),
-                    AppButton.icon(
-                      expand: true,
-                      onPressed: onFollowUp,
-                      icon: const AppIcon(
-                        iconData: AppIcons.call,
-                        color: AppColors.onAccent,
-                      ),
-                      text: l10n.callFollowUpStart,
-                    ),
-                  ],
+                child: AppButton.icon(
+                  expand: true,
+                  onPressed: onFollowUp,
+                  icon: const AppIcon(
+                    iconData: AppIcons.call,
+                    color: AppColors.onAccent,
+                  ),
+                  text: l10n.subjectContinue(call.coach.label(l10n)),
                 ),
               ),
             ),
@@ -220,54 +209,6 @@ class _Learning extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({
-    required this.icon,
-    required this.value,
-    required this.label,
-    required this.delta,
-    this.fewerIsBetter = false,
-  });
-
-  final AppIconData icon;
-  final int value;
-  final String label;
-  final int? delta;
-  final bool fewerIsBetter;
-
-  @override
-  Widget build(BuildContext context) {
-    final d = delta;
-    final better = fewerIsBetter && d != null && d < 0;
-
-    return AppCard(
-      padding: const EdgeInsets.all(AppSpacing.s3),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AppIcon(
-            iconData: icon,
-            size: AppSpacing.iconSmall + 2,
-            color: AppColors.ink2,
-          ),
-          const SizedBox(height: AppSpacing.s2),
-          Text('$value', style: AppTypography.headline),
-          Text(label, style: AppTypography.caption),
-          if (d != null && d != 0) ...[
-            const SizedBox(height: AppSpacing.s1),
-            Text(
-              context.l10n.metricSinceFirst(d > 0 ? '+$d' : '−${-d}'),
-              style: AppTypography.caption.copyWith(
-                color: better ? AppColors.positive : AppColors.ink2,
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }

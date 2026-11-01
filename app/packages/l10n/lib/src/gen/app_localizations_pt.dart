@@ -269,4 +269,63 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get callFollowUpNote => 'O Vox lembra desta conversa e começa de onde vocês pararam.';
+
+  @override
+  String get homeNewSubject => 'Novo assunto';
+
+  @override
+  String get subjectsTitle => 'Seus assuntos';
+
+  @override
+  String get subjectCallsTitle => 'Ligações';
+
+  @override
+  String subjectContinue(String coach) {
+    return 'Continuar com $coach';
+  }
+
+  @override
+  String callSubjectIndexShort(int index) {
+    return '$indexª';
+  }
+
+  @override
+  String get coachPickerTitle => 'Novo assunto';
+
+  @override
+  String get coachPickerBody => 'Quem te acompanha nele? Fica o mesmo até o fim do assunto.';
+
+  @override
+  String coachPickerStart(String coach) {
+    return 'Começar com $coach';
+  }
+
+  @override
+  String coachPickerListen(String coach) {
+    return 'Ouvir $coach';
+  }
+
+  @override
+  String get coachBianca => 'Bianca';
+
+  @override
+  String get coachBruno => 'Bruno';
+
+  @override
+  String get coachHaley => 'Haley';
+
+  @override
+  String get coachMarcus => 'Marcus';
+
+  @override
+  String get languagePortuguese => 'Português';
+
+  @override
+  String get languageEnglish => 'Inglês';
+
+  @override
+  String get languageTagPt => 'PT';
+
+  @override
+  String get languageTagEn => 'EN';
 }

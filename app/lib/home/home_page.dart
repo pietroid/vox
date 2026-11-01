@@ -27,34 +27,51 @@ class HomePage extends StatelessWidget {
   }
 }
 
-/// Starts a call from the home, [follows] another or fresh, and reads the
-/// history again once it ends.
-Future<void> startCall(BuildContext context, {String? follows}) async {
+/// Starts a call from the home, [follows] another or fresh with [coach],
+/// and reads the history again once it ends.
+Future<void> startCall(
+  BuildContext context, {
+  String? follows,
+  Coach? coach,
+}) async {
   final cubit = context.read<CallHistoryCubit>();
   final connected = await context.push<bool>(
-    follows == null
-        ? '/ligacao'
-        : Uri(
-            path: '/ligacao',
-            queryParameters: {'follows': follows},
-          ).toString(),
+    Uri(
+      path: '/ligacao',
+      queryParameters: {
+        'follows': ?follows,
+        if (coach != null && follows == null) 'coach': coach.name,
+      },
+    ).toString(),
   );
   // A back gesture says nothing: the call may have happened.
   await cubit.afterCall(connected: connected ?? true);
 }
 
-/// Opens [call]'s page; its "Continuar este assunto" comes back here as
-/// `true`, and the follow-up starts from the home, which then reloads.
-Future<void> openCall(BuildContext context, CallRecord call) async {
-  final cubit = context.read<CallHistoryCubit>()..markSeen(call.id).ignore();
+/// "Novo assunto": picks the coach, the last one used first, then starts
+/// the subject's first call with them.
+Future<void> startNewSubject(BuildContext context) async {
+  final calls = context.read<CallHistoryCubit>().state.calls;
+  final coach = await showCoachPicker(
+    context,
+    initial: calls.isEmpty ? null : calls.first.coach,
+  );
+  if (coach != null && context.mounted) {
+    await startCall(context, coach: coach);
+  }
+}
+
+/// Opens [subject]'s page; "Continuar com …" comes back here as `true`,
+/// and the follow-up of its newest call starts from the home.
+Future<void> openSubject(BuildContext context, CallSubject subject) async {
+  final cubit = context.read<CallHistoryCubit>();
   final followUp = await context.push<bool>(
-    '/ligacoes/${call.id}',
-    extra: call,
+    '/assuntos/${subject.id}',
+    extra: subject,
   );
   if (followUp == true && context.mounted) {
-    await startCall(context, follows: call.id);
+    await startCall(context, follows: subject.latest.id);
   } else if (!cubit.isClosed) {
-    // The detail may have been opened on a stale copy.
     cubit.load().ignore();
   }
 }
@@ -121,7 +138,7 @@ class HomeView extends StatelessWidget {
             ),
           CallHistoryState(isFirstRun: true) => _FirstCall(goal: state.goal),
           _ => _History(
-            calls: state.calls,
+            subjects: state.subjects,
             summarizing: state.summarizing,
             now: now ?? DateTime.now(),
           ),
@@ -188,7 +205,7 @@ class _FirstCall extends StatelessWidget {
               children: [
                 AppButton.icon(
                   expand: true,
-                  onPressed: () => startCall(context),
+                  onPressed: () => startNewSubject(context),
                   icon: const AppIcon(
                     iconData: AppIcons.call,
                     color: AppColors.onAccent,
@@ -208,97 +225,96 @@ class _FirstCall extends StatelessWidget {
 
 class _History extends StatelessWidget {
   const _History({
-    required this.calls,
+    required this.subjects,
     required this.summarizing,
     required this.now,
   });
 
-  final List<CallRecord> calls;
+  final List<CallSubject> subjects;
   final bool summarizing;
   final DateTime now;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final last = calls.first;
-    final total = calls.fold(Duration.zero, (sum, c) => sum + c.duration);
-    final firstDone = calls.length == 1;
-    final lesson = last.learnings.isEmpty ? null : last.learnings.first;
+    final calls = subjects.fold(0, (sum, s) => sum + s.calls.length);
+    final total = subjects.fold(Duration.zero, (sum, s) => sum + s.duration);
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.s6,
-        AppSpacing.s2,
-        AppSpacing.s6,
-        AppSpacing.s8,
-      ),
+    return Column(
       children: [
-        AppCard(
-          tone: AppCardTone.accent,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.s6,
+              AppSpacing.s2,
+              AppSpacing.s6,
+              AppSpacing.s8,
+            ),
             children: [
-              Text(
-                firstDone ? l10n.homeFirstDoneTitle : l10n.homeNextTitle,
-                style: AppTypography.title,
-              ),
-              const SizedBox(height: AppSpacing.s2),
-              Text(
-                firstDone
-                    ? l10n.homeFirstDoneBody
-                    : lesson == null
-                    ? l10n.homeNextBody
-                    : l10n.homeNextLastLearning(lesson),
-                style: AppTypography.label.copyWith(color: AppColors.ink),
-              ),
-              const SizedBox(height: AppSpacing.s4),
-              AppButton.icon(
-                expand: true,
-                onPressed: () => startCall(context),
-                icon: const AppIcon(
-                  iconData: AppIcons.call,
-                  color: AppColors.onAccent,
-                ),
-                text: l10n.homeCallStart,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.s8),
-        Text(l10n.historyTitle, style: AppTypography.title),
-        const SizedBox(height: AppSpacing.s1),
-        Text(
-          l10n.historyTotals(calls.length, context.callDuration(total)),
-          style: AppTypography.caption,
-        ),
-        const SizedBox(height: AppSpacing.s4),
-        if (summarizing)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.s3),
-            child: AppCard(
-              child: Row(
+              Row(
                 children: [
-                  const _Spinner(),
-                  const SizedBox(width: AppSpacing.s3),
                   Expanded(
-                    child: Text(
-                      l10n.historySummarizing,
-                      style: AppTypography.label,
-                    ),
+                    child: Text(l10n.subjectsTitle, style: AppTypography.title),
+                  ),
+                  AppMeta(icon: AppIcons.calls, text: '$calls'),
+                  const SizedBox(width: AppSpacing.s3),
+                  AppMeta(
+                    icon: AppIcons.duration,
+                    text: context.callDuration(total),
                   ),
                 ],
               ),
+              const SizedBox(height: AppSpacing.s4),
+              if (summarizing)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.s3),
+                  child: AppCard(
+                    child: Row(
+                      children: [
+                        const _Spinner(),
+                        const SizedBox(width: AppSpacing.s3),
+                        Expanded(
+                          child: Text(
+                            l10n.historySummarizing,
+                            style: AppTypography.label,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              for (final subject in subjects)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.s3),
+                  child: SubjectCard(
+                    subject: subject,
+                    now: now,
+                    onTap: () => openSubject(context, subject),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.s6,
+              AppSpacing.s2,
+              AppSpacing.s6,
+              AppSpacing.s4,
+            ),
+            child: AppButton.icon(
+              expand: true,
+              onPressed: () => startNewSubject(context),
+              icon: const AppIcon(
+                iconData: AppIcons.newSubject,
+                color: AppColors.onAccent,
+              ),
+              text: l10n.homeNewSubject,
             ),
           ),
-        for (final call in calls)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.s3),
-            child: CallCard(
-              call: call,
-              now: now,
-              onTap: () => openCall(context, call),
-            ),
-          ),
+        ),
       ],
     );
   }

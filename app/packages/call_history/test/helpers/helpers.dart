@@ -37,9 +37,12 @@ CallRecord record({
   CallMetrics? metrics,
   int subjectIndex = 1,
   bool seen = true,
+  String? subject,
+  Coach coach = Coach.bianca,
+  DateTime? startedAt,
 }) => CallRecord(
   id: id,
-  startedAt: DateTime(2026, 11, 1, 19, 42),
+  startedAt: startedAt ?? DateTime(2026, 11, 1, 19, 42),
   duration: const Duration(minutes: 6, seconds: 12),
   costUsd: 0.07,
   title: 'Apresentação do trimestre',
@@ -48,6 +51,8 @@ CallRecord record({
   metrics: metrics,
   subjectIndex: subjectIndex,
   seen: seen,
+  subject: subject,
+  coach: coach,
 );
 
 /// The server, in memory: every call recorded.

@@ -198,5 +198,81 @@
   "@callFollowUpStart": {
     "description": "The detail's one button: a new call that picks up this one."
   },
-  "callFollowUpNote": "O Vox lembra desta conversa e começa de onde vocês pararam."
+  "callFollowUpNote": "O Vox lembra desta conversa e começa de onde vocês pararam.",
+  "homeNewSubject": "Novo assunto",
+  "@homeNewSubject": {
+    "description": "The home's one button: picks a coach and starts a call on a new subject."
+  },
+  "subjectsTitle": "Seus assuntos",
+  "@subjectsTitle": {
+    "description": "The heading over the list of subjects on the home."
+  },
+  "subjectCallsTitle": "Ligações",
+  "@subjectCallsTitle": {
+    "description": "The heading over a subject's calls on its page."
+  },
+  "subjectContinue": "Continuar com {coach}",
+  "@subjectContinue": {
+    "description": "The subject page's one button: calls the same coach again on it.",
+    "placeholders": {
+      "coach": {
+        "type": "String"
+      }
+    }
+  },
+  "callSubjectIndexShort": "{index}ª",
+  "@callSubjectIndexShort": {
+    "description": "Which call on its subject this is, in a small round badge.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "coachPickerTitle": "Novo assunto",
+  "@coachPickerTitle": {
+    "description": "The coach sheet's heading."
+  },
+  "coachPickerBody": "Quem te acompanha nele? Fica o mesmo até o fim do assunto.",
+  "@coachPickerBody": {
+    "description": "Under the coach sheet's heading: the coach is kept for every call on the subject."
+  },
+  "coachPickerStart": "Começar com {coach}",
+  "@coachPickerStart": {
+    "description": "The coach sheet's button: starts the subject's first call.",
+    "placeholders": {
+      "coach": {
+        "type": "String"
+      }
+    }
+  },
+  "coachPickerListen": "Ouvir {coach}",
+  "@coachPickerListen": {
+    "description": "Tooltip of the speaker button that plays a coach's voice.",
+    "placeholders": {
+      "coach": {
+        "type": "String"
+      }
+    }
+  },
+  "coachBianca": "Bianca",
+  "@coachBianca": {
+    "description": "A coach's name: the Flux TTS voice's own name, never translated."
+  },
+  "coachBruno": "Bruno",
+  "coachHaley": "Haley",
+  "coachMarcus": "Marcus",
+  "languagePortuguese": "Português",
+  "@languagePortuguese": {
+    "description": "A coach group: the calls are in Brazilian Portuguese."
+  },
+  "languageEnglish": "Inglês",
+  "@languageEnglish": {
+    "description": "A coach group: the calls are in English."
+  },
+  "languageTagPt": "PT",
+  "@languageTagPt": {
+    "description": "The tiny language tag on a coach's avatar."
+  },
+  "languageTagEn": "EN"
 }

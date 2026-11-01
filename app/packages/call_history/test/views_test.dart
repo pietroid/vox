@@ -1,3 +1,4 @@
+import 'package:app_ui/app_ui.dart';
 import 'package:call_history/call_history.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -98,10 +99,10 @@ void main() {
       expect(find.text('Resumo'), findsOneWidget);
       expect(find.text('Abrir pelo resultado'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('148'), 200);
-      expect(find.text('−17 desde a 1ª'), findsOneWidget);
-      expect(find.text('−5 desde a 1ª'), findsOneWidget);
+      expect(find.text('17'), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
 
-      await tester.tap(find.text('Continuar este assunto'));
+      await tester.tap(find.text('Continuar com Bianca'));
       expect(followed, isTrue);
     });
 
@@ -113,6 +114,76 @@ void main() {
       );
 
       expect(find.text('Seus números'), findsNothing);
+    });
+  });
+
+  group('CoachPicker', () {
+    testWidgets('offers four coaches by language and answers the one picked', (
+      tester,
+    ) async {
+      Coach? picked;
+      await tester.pumpWidget(
+        app(
+          Builder(
+            builder: (context) => TextButton(
+              onPressed: () async => picked = await showCoachPicker(context),
+              child: const Text('abrir'),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Português'), findsOneWidget);
+      expect(find.text('Inglês'), findsOneWidget);
+      for (final name in ['Bianca', 'Bruno', 'Haley', 'Marcus']) {
+        expect(find.text(name), findsOneWidget);
+      }
+      expect(find.text('Começar com Bianca'), findsOneWidget);
+
+      await tester.tap(find.text('Marcus'));
+      await tester.pump();
+      await tester.tap(find.text('Começar com Marcus'));
+      await tester.pumpAndSettle();
+      expect(picked, Coach.marcus);
+    });
+  });
+
+  group('SubjectPage', () {
+    testWidgets('lists its calls newest first and continues with its coach', (
+      tester,
+    ) async {
+      final subject = CallSubject.group([
+        record(
+          id: 'c2',
+          subject: 'c1',
+          subjectIndex: 2,
+          seen: false,
+          coach: Coach.haley,
+        ),
+        record(coach: Coach.haley),
+      ]).single;
+      CallRecord? opened;
+      var continued = false;
+      await tester.pumpWidget(
+        app(
+          SubjectPage(
+            subject: subject,
+            now: now,
+            onOpenCall: (call) => opened = call,
+            onContinue: () => continued = true,
+          ),
+        ),
+      );
+
+      expect(find.text('Haley'), findsOneWidget);
+      expect(find.text('2ª'), findsOneWidget);
+      expect(find.text('1ª'), findsOneWidget);
+      await tester.tap(find.text('2ª'));
+      expect(opened?.id, 'c2');
+      await tester.tap(find.text('Continuar com Haley'));
+      expect(continued, isTrue);
     });
   });
 }

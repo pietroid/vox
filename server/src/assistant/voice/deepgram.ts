@@ -64,11 +64,17 @@ export interface Speaker {
 /** Opens both sockets; one per call. */
 export interface VoiceVendor {
   readonly configured: boolean;
-  listen(thresholds: TurnThresholds, events: ListenerEvents): Listener;
-  speaker(events: SpeakerEvents): Speaker;
+  /** [language] hints Flux STT ('pt', 'en'). */
+  listen(
+    thresholds: TurnThresholds,
+    events: ListenerEvents,
+    language?: string,
+  ): Listener;
+  /** [voice] is the Flux TTS model, the coach's. */
+  speaker(events: SpeakerEvents, voice?: string): Speaker;
 }
 
-/** The voice the agent speaks with: Flux TTS, Brazilian Portuguese. */
+/** The voice when none is named: Flux TTS, Brazilian Portuguese (`calls/coaches.ts`). */
 export const VOICE = 'flux-bianca-pt';
 /** The phone plays what the server sends at this rate. */
 export const SPEECH_RATE = 24_000;
@@ -85,10 +91,14 @@ export class Deepgram implements VoiceVendor {
     return { Authorization: `Token ${this._key}` };
   }
 
-  listen(thresholds: TurnThresholds, events: ListenerEvents): Listener {
+  listen(
+    thresholds: TurnThresholds,
+    events: ListenerEvents,
+    language = 'pt',
+  ): Listener {
     const url =
       'wss://api.deepgram.com/v2/listen?model=flux-general-multi' +
-      '&language_hint=pt&encoding=linear16&sample_rate=16000' +
+      `&language_hint=${language}&encoding=linear16&sample_rate=16000` +
       `&eot_threshold=${thresholds.eot_threshold}` +
       `&eot_timeout_ms=${thresholds.eot_timeout_ms}`;
     const socket = new WebSocket(url, { headers: this._headers });
@@ -134,9 +144,9 @@ export class Deepgram implements VoiceVendor {
     };
   }
 
-  speaker(events: SpeakerEvents): Speaker {
+  speaker(events: SpeakerEvents, voice = VOICE): Speaker {
     const url =
-      `wss://api.deepgram.com/v2/speak?model=${VOICE}` +
+      `wss://api.deepgram.com/v2/speak?model=${voice}` +
       `&encoding=linear16&sample_rate=${SPEECH_RATE}`;
     const socket = new WebSocket(url, { headers: this._headers });
     const waiting: string[] = [];

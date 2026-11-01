@@ -83,3 +83,24 @@ prompt (`coachPrompt(user, memory)`):
   `GoalPicker`, `CallCard`, `CallDetailPage`); `lib/home/home_page.dart`
   (`startCall`, `openCall`) and `lib/home/call_detail_route.dart`;
   `CallPage(follows:)` pops whether the call got through.
+
+## Coaches and subjects
+
+Added in [`product/delivery/2026-11-01-coaches/`](../delivery/2026-11-01-coaches/README.md).
+
+- The home lists **subjects** (*Seus assuntos*), not calls: one card per
+  subject with its coach, latest title, day, number of calls and total time,
+  plus a dot while a call on it is unopened. The one button is *Novo assunto*,
+  which opens the coach picker.
+- **Four coaches** (`server/src/calls/coaches.ts`, app `Coach`):
+  `bianca`, `bruno` (pt), `haley`, `marcus` (en), each speaking with the
+  Flux TTS voice of the same name. Flux STT is hinted with the coach's
+  language. An English coach answers only in English; the notes stay in
+  Portuguese.
+- `wss …/voice?coach=<key>` starts a new subject with that coach (Bianca
+  when the key is unknown or absent). **A follow-up keeps its subject's coach**,
+  whatever the app sends. Stored in `call.coach`; calls from before this read
+  as Bianca.
+- `CallView` adds `coach` and `subjectId`.
+- `/assuntos/:id` (app): the subject, its coach, its latest numbers with
+  trends since the first call, its calls, and *Continuar com <coach>*.

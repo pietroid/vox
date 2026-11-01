@@ -14,6 +14,7 @@ import type { Auth } from '../../auth/auth';
 import { AUTH, AuthUser } from '../../auth/auth.tokens';
 import { headersOf } from '../../auth/session.guard';
 import { CallBrief, CallsService } from '../../calls/calls.service';
+import { coachOf } from '../../calls/coaches';
 import { OpenRouterClient } from '../openrouter.client';
 import { bytesOf, Deepgram } from './deepgram';
 import { VoiceSession } from './voice-session';
@@ -32,7 +33,8 @@ export const UNAUTHORIZED = 4401;
  * answers 503.
  *
  * `?follows=<callId>` continues a subject: the coach is told the earlier
- * calls on it. When the socket closes, the call goes to the history
+ * calls on it, and the subject's coach speaks. `?coach=<key>` picks who
+ * starts a new subject (`calls/coaches.ts`). When the socket closes, the call goes to the history
  * (`CallsService.record`), which keeps the model's notes and the numbers.
  */
 @Injectable()
@@ -101,13 +103,18 @@ export class VoiceGateway implements OnApplicationShutdown {
     }
 
     const available = this._vendor.configured && this._model.configured;
-    let brief: CallBrief = { memory: '' };
+    const params = new URL(request.url ?? '', 'http://x').searchParams;
+    let brief: CallBrief = {
+      memory: '',
+      coach: coachOf(params.get('coach')),
+    };
     if (user !== undefined && available) {
-      const follows =
-        new URL(request.url ?? '', 'http://x').searchParams.get('follows') ??
-        undefined;
       try {
-        brief = await this._calls.brief(user.id, follows);
+        brief = await this._calls.brief(
+          user.id,
+          params.get('follows') ?? undefined,
+          brief.coach.key,
+        );
       } catch (error) {
         // The history is a bonus: without it the call still starts.
         this._logger.warn(`brief failed: ${String(error)}`);
@@ -146,7 +153,11 @@ export class VoiceGateway implements OnApplicationShutdown {
       this._model,
       log,
       undefined,
-      { memory: brief.memory, followUp: brief.follows !== undefined },
+      {
+        memory: brief.memory,
+        followUp: brief.follows !== undefined,
+        coach: brief.coach,
+      },
     );
 
     ws.on('message', (data, binary) => {
@@ -171,6 +182,7 @@ export class VoiceGateway implements OnApplicationShutdown {
         spoken_chars: r.spokenChars,
         usd: r.usd,
         follow_up: brief.follows !== undefined,
+        coach: brief.coach.key,
       });
       this._calls
         .record(user.id, brief, {

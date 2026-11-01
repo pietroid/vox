@@ -14,10 +14,13 @@ import 'package:l10n/l10n.dart';
 /// {@endtemplate}
 class CallPage extends StatelessWidget {
   /// {@macro call_page}
-  const CallPage({this.follows, super.key});
+  const CallPage({this.follows, this.coach, super.key});
 
   /// The id of the call this one continues: the agent remembers it.
   final String? follows;
+
+  /// Who starts a new subject: a coach's key, the server's default without.
+  final String? coach;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +28,7 @@ class CallPage extends StatelessWidget {
       create: (context) => CallCubit(
         service: context.read<CallService>(),
         follows: follows,
+        coach: coach,
       )..start().ignore(),
       child: const CallView(),
     );

@@ -1,7 +1,9 @@
 import { AuthUser } from '../../auth/auth.tokens';
+import { Coach, coachOf } from '../../calls/coaches';
 import { ChatMessage, ModelUsage } from '../openrouter.client';
 import {
   coachPrompt,
+  greeting,
   SentenceSplitter,
   TAKE_SECONDS,
   turnMessage,
@@ -47,6 +49,8 @@ export interface SessionBrief {
   memory?: string;
   /** The call continues a subject: the greeting says so. */
   followUp?: boolean;
+  /** Who speaks, in which voice and language; Bianca when absent. */
+  coach?: Coach;
 }
 
 /** The phone's end of the call. */
@@ -129,6 +133,10 @@ export class VoiceSession {
   private readonly _track = new VoiceTrack();
   private readonly _history: ChatMessage[] = [];
   private readonly _listener: Listener;
+  /** Who speaks: the subject's coach, Bianca when the history named none. */
+  private get _coach(): Coach {
+    return this._brief.coach ?? coachOf();
+  }
   private _speaker: Speaker;
   private _state: CallState = 'listening';
   private _muted = false;
@@ -162,10 +170,14 @@ export class VoiceSession {
     private readonly _now: () => number = () => performance.now(),
     private readonly _brief: SessionBrief = {},
   ) {
-    this._listener = _vendor.listen(SHORT_TURN, {
-      onTurn: (event) => this._onTurn(event),
-      onClose: (error) => error && this._fail(error),
-    });
+    this._listener = _vendor.listen(
+      SHORT_TURN,
+      {
+        onTurn: (event) => this._onTurn(event),
+        onClose: (error) => error && this._fail(error),
+      },
+      this._coach.language,
+    );
     this._speaker = this._openSpeaker();
     this._cap = setTimeout(
       () => this.hangUp(4000, 'A ligação chegou ao limite de 30 minutos.'),
@@ -314,7 +326,10 @@ export class VoiceSession {
     if (span >= ACKNOWLEDGE_SECONDS) this._say(reply, ACKNOWLEDGEMENT);
 
     const messages: ChatMessage[] = [
-      { role: 'system', content: coachPrompt(this._user, this._brief.memory) },
+      {
+        role: 'system',
+        content: coachPrompt(this._user, this._brief.memory, this._coach),
+      },
       ...this._history.slice(-HISTORY),
       {
         role: 'user',
@@ -366,9 +381,7 @@ export class VoiceSession {
     this._reply = reply;
     this._say(
       reply,
-      this._brief.followUp
-        ? `Oi, ${name}! Vamos continuar de onde paramos?`
-        : `Oi, ${name}! O que você quer treinar hoje?`,
+      greeting(name, this._coach, this._brief.followUp === true),
     );
   }
 
@@ -380,34 +393,37 @@ export class VoiceSession {
 
   private _openSpeaker(): Speaker {
     // Events of a speaker replaced on cut-in are dropped.
-    const speaker: Speaker = this._vendor.speaker({
-      onSentence: () => {
-        if (this._speaker !== speaker) return;
-        const reply = this._reply;
-        const caption = reply?.captions.shift();
-        if (reply === undefined || caption === undefined) return;
-        reply.spoken.push(caption);
-        if (reply.firstAudioMs === undefined) {
-          reply.firstAudioMs = Math.round(this._now() - reply.endedAt);
-          this._commitTurn();
-        }
-        this._send({ type: 'caption', text: caption });
-        this._setState('speaking');
+    const speaker: Speaker = this._vendor.speaker(
+      {
+        onSentence: () => {
+          if (this._speaker !== speaker) return;
+          const reply = this._reply;
+          const caption = reply?.captions.shift();
+          if (reply === undefined || caption === undefined) return;
+          reply.spoken.push(caption);
+          if (reply.firstAudioMs === undefined) {
+            reply.firstAudioMs = Math.round(this._now() - reply.endedAt);
+            this._commitTurn();
+          }
+          this._send({ type: 'caption', text: caption });
+          this._setState('speaking');
+        },
+        onAudio: (pcm) => {
+          if (this._speaker !== speaker || this._reply === undefined) return;
+          this._phone.sendAudio(pcm);
+        },
+        onSentenceDone: (chars) => {
+          this._report.spokenChars += chars;
+          if (this._speaker !== speaker || this._reply === undefined) return;
+          this._reply.pending--;
+          this._finishIfDone(this._reply);
+        },
+        onClose: (error) => {
+          if (this._speaker === speaker && error) this._fail(error);
+        },
       },
-      onAudio: (pcm) => {
-        if (this._speaker !== speaker || this._reply === undefined) return;
-        this._phone.sendAudio(pcm);
-      },
-      onSentenceDone: (chars) => {
-        this._report.spokenChars += chars;
-        if (this._speaker !== speaker || this._reply === undefined) return;
-        this._reply.pending--;
-        this._finishIfDone(this._reply);
-      },
-      onClose: (error) => {
-        if (this._speaker === speaker && error) this._fail(error);
-      },
-    });
+      this._coach.voice,
+    );
     return speaker;
   }
 

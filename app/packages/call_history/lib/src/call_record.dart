@@ -1,3 +1,4 @@
+import 'package:call_history/src/coach.dart';
 import 'package:equatable/equatable.dart';
 
 /// {@template call_metrics}
@@ -72,6 +73,8 @@ class CallRecord extends Equatable {
     this.metrics,
     this.subjectIndex = 1,
     this.seen = true,
+    this.coach = Coach.bianca,
+    this._subject,
   });
 
   /// As `GET /calls` sends it. The start comes in UTC and is shown in the
@@ -93,6 +96,8 @@ class CallRecord extends Equatable {
           : null,
       subjectIndex: (json['subjectIndex'] as num?)?.round() ?? 1,
       seen: json['seen'] as bool? ?? true,
+      coach: Coach.fromKey(json['coach'] as String?),
+      subject: json['subjectId'] as String?,
     );
   }
 
@@ -127,6 +132,14 @@ class CallRecord extends Equatable {
   /// Whether the person has opened it.
   final bool seen;
 
+  /// Who coached it: the coach its subject started with.
+  final Coach coach;
+
+  final String? _subject;
+
+  /// The id of the call that started its subject; its own on a fresh call.
+  String get subjectId => _subject ?? id;
+
   /// The same call, opened.
   CallRecord asSeen() => seen
       ? this
@@ -140,6 +153,8 @@ class CallRecord extends Equatable {
           learnings: learnings,
           metrics: metrics,
           subjectIndex: subjectIndex,
+          coach: coach,
+          subject: _subject,
         );
 
   @override
@@ -154,5 +169,7 @@ class CallRecord extends Equatable {
     metrics,
     subjectIndex,
     seen,
+    coach,
+    subjectId,
   ];
 }

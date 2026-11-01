@@ -78,6 +78,12 @@ abstract final class AppSpacing {
   /// The round number in front of an item of a numbered list.
   static const badge = 28.0;
 
+  /// A coach's avatar in a list row.
+  static const avatar = 40.0;
+
+  /// A coach's avatar where it is the thing picked or the page's head.
+  static const avatarLarge = 56.0;
+
   /// The widest a content column ever gets, so text stays readable on web.
   static const maxContentWidth = 560.0;
 }

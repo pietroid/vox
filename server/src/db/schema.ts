@@ -141,6 +141,8 @@ export const call = pgTable(
     subjectId: text('subject_id').notNull(),
     subjectIndex: integer('subject_index').notNull(),
     followsCallId: text('follows_call_id'),
+    /** Who coaches the subject (`calls/coaches.ts`); earlier calls had Bianca. */
+    coach: text('coach').notNull().default('bianca'),
     seenAt: timestamp('seen_at', { withTimezone: true }),
     createdAt: createdAt(),
   },

@@ -130,8 +130,11 @@ until a call is kept, then the history. When a call's socket closes, the
 server keeps it if the person was answered: the model writes a title, a
 summary and up to three learnings once, from the conversation, and **only
 those notes, the numbers, the time and the cost are stored**, never the
-transcript. *Continuar este assunto* dials `?follows=<id>`, and the coach is
-told the subject's last 3 calls. Server in `server/src/calls/`, app in
+transcript. The home groups calls by **subject**; *Novo assunto* picks one of
+four coaches (Bianca/Bruno in Portuguese, Haley/Marcus in English,
+`calls/coaches.ts`) and dials `?coach=<key>`. A follow-up dials
+`?follows=<id>`, **keeps the subject's coach**, and the coach is told the
+subject's last 3 calls. Server in `server/src/calls/`, app in
 `app/packages/call_history/`; routes and rules in
 [product/spec/call-history.md](./product/spec/call-history.md).
 

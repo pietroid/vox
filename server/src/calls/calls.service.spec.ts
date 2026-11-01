@@ -6,6 +6,7 @@ import { FALLBACK_NOTES } from './call-summary';
 import { CallRow, InMemoryCallStore } from './call.store';
 import { CallsController, GoalController } from './calls.controller';
 import { CallsService, FinishedCall } from './calls.service';
+import { coachOf } from './coaches';
 
 const ana: AuthUser = { id: 'ana', email: 'ana@exemplo.com', name: 'Ana' };
 const bia: AuthUser = { id: 'bia', email: 'bia@exemplo.com', name: 'Bia' };
@@ -85,7 +86,11 @@ describe('CallsService', () => {
   it('keeps a call with the notes the model wrote and the summed numbers', async () => {
     const { service, asked } = setUp(answering);
 
-    const row = await service.record(ana.id, { memory: '' }, finished());
+    const row = await service.record(
+      ana.id,
+      { memory: '', coach: coachOf() },
+      finished(),
+    );
 
     expect(row).toMatchObject<Partial<CallRow>>({
       id: 'c1',
@@ -108,7 +113,11 @@ describe('CallsService', () => {
   it('keeps nothing of a call in which nobody was answered', async () => {
     const { service, store } = setUp(answering);
 
-    await service.record(ana.id, { memory: '' }, finished({ turns: 0 }));
+    await service.record(
+      ana.id,
+      { memory: '', coach: coachOf() },
+      finished({ turns: 0 }),
+    );
 
     expect(store.rows).toHaveLength(0);
   });
@@ -116,7 +125,11 @@ describe('CallsService', () => {
   it('still keeps the call when the model fails', async () => {
     const { service } = setUp(() => Promise.reject(new Error('down')));
 
-    const row = await service.record(ana.id, { memory: '' }, finished());
+    const row = await service.record(
+      ana.id,
+      { memory: '', coach: coachOf() },
+      finished(),
+    );
 
     expect(row?.title).toBe(FALLBACK_NOTES.title);
     expect(row?.learnings).toEqual([]);
@@ -125,7 +138,11 @@ describe('CallsService', () => {
 
   it('a follow-up joins the subject, remembers it and shows the change', async () => {
     const { service, calls } = setUp(answering);
-    const first = await service.record(ana.id, { memory: '' }, finished());
+    const first = await service.record(
+      ana.id,
+      { memory: '', coach: coachOf() },
+      finished(),
+    );
 
     const brief = await service.brief(ana.id, first!.id);
     expect(brief.follows?.id).toBe('c1');
@@ -163,11 +180,47 @@ describe('CallsService', () => {
 
   it("starts fresh from someone else's call", async () => {
     const { service } = setUp(answering);
-    const theirs = await service.record(bia.id, { memory: '' }, finished());
+    const theirs = await service.record(
+      bia.id,
+      { memory: '', coach: coachOf() },
+      finished(),
+    );
 
     const brief = await service.brief(ana.id, theirs!.id);
 
-    expect(brief).toEqual({ memory: '', follows: undefined });
+    expect(brief).toEqual({
+      memory: '',
+      follows: undefined,
+      coach: coachOf(),
+    });
+  });
+
+  it('keeps the coach a subject started with on every follow-up', async () => {
+    const { service } = setUp(answering);
+    const first = await service.record(
+      ana.id,
+      await service.brief(ana.id, undefined, 'marcus'),
+      finished(),
+    );
+    expect(first!.coach).toBe('marcus');
+
+    // The app asks for no coach on a follow-up; another one is ignored too.
+    const brief = await service.brief(ana.id, first!.id, 'bruno');
+    expect(brief.coach).toMatchObject({ key: 'marcus', language: 'en' });
+    await service.record(ana.id, brief, finished());
+
+    const { calls } = await service.history(ana.id);
+    expect(calls.map((it) => [it.coach, it.subjectId])).toEqual([
+      ['marcus', first!.id],
+      ['marcus', first!.id],
+    ]);
+  });
+
+  it('starts an unknown coach as Bianca', async () => {
+    const { service } = setUp(answering);
+    expect((await service.brief(ana.id, undefined, 'hal')).coach.key).toBe(
+      'bianca',
+    );
   });
 
   it('tells the first call about the goal', async () => {
@@ -184,7 +237,7 @@ describe('CallsService', () => {
 describe('CallsController', () => {
   it("reads and marks only the person's own calls", async () => {
     const { service, calls } = setUp(answering);
-    await service.record(bia.id, { memory: '' }, finished());
+    await service.record(bia.id, { memory: '', coach: coachOf() }, finished());
 
     await expect(calls.list(ana)).resolves.toEqual({ goal: null, calls: [] });
     await expect(calls.one(ana, 'c1')).rejects.toThrow(NotFoundException);

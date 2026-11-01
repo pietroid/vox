@@ -11,8 +11,9 @@ abstract interface class CallService {
   /// Whether this platform can call at all (the phones, for now).
   bool get supported;
 
-  /// Opens the call; [follows] is the id of the call it continues.
-  Future<VoiceLine> dial({String? follows});
+  /// Opens the call; [follows] is the id of the call it continues, and
+  /// [coach] who starts a new subject (a follow-up keeps its own).
+  Future<VoiceLine> dial({String? follows, String? coach});
 
   /// The mic, for one call.
   Microphone microphone();
@@ -38,19 +39,24 @@ class ServerCallService implements CallService {
   @override
   bool get supported => socketsSupported;
 
-  /// The socket's address: the API's, with ws for http, and `?follows=`
-  /// when the call continues an earlier one.
-  Uri uri({String? follows}) {
+  /// The socket's address: the API's, with ws for http, `?follows=` when
+  /// the call continues an earlier one, and `?coach=` when it starts a
+  /// subject with someone.
+  Uri uri({String? follows, String? coach}) {
     final api = Uri.base.resolve('$apiBaseUrl/assistant/voice');
+    final query = {'follows': ?follows, 'coach': ?coach};
     return api.replace(
       scheme: api.scheme == 'https' ? 'wss' : 'ws',
-      queryParameters: follows == null ? null : {'follows': follows},
+      queryParameters: query.isEmpty ? null : query,
     );
   }
 
   @override
-  Future<VoiceLine> dial({String? follows}) async =>
-      connectVoice(uri(follows: follows), token: await token());
+  Future<VoiceLine> dial({String? follows, String? coach}) async =>
+      connectVoice(
+        uri(follows: follows, coach: coach),
+        token: await token(),
+      );
 
   @override
   Microphone microphone() => RecordMicrophone();

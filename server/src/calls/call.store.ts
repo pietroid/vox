@@ -16,6 +16,8 @@ export interface CallRow {
   subjectId: string;
   subjectIndex: number;
   followsCallId: string | null;
+  /** A `CoachKey`; the subject's first call picked it. */
+  coach: string;
   seenAt: Date | null;
 }
 

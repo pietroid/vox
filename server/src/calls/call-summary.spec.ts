@@ -48,6 +48,7 @@ describe('memoryPrompt', () => {
     startedAt: new Date(Date.UTC(2026, 9, i + 1, 2)),
     durationMs: 1000,
     costUsd: 0.01,
+    coach: 'bianca',
     title: `Ensaio ${i}`,
     summary: 'Resumo.',
     learnings: [],

@@ -1,0 +1,1 @@
+ALTER TABLE "call" ADD COLUMN "coach" text DEFAULT 'bianca' NOT NULL;

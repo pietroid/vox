@@ -1,3 +1,4 @@
+import { coachOf } from '../../calls/coaches';
 import { AuthUser } from '../../auth/auth.tokens';
 import { ChatMessage } from '../openrouter.client';
 import {
@@ -31,9 +32,16 @@ class FakeVendor implements VoiceVendor {
   configured_: TurnThresholds[] = [];
   endedTurns = 0;
   listenerClosed = false;
+  language?: string;
+  voices: (string | undefined)[] = [];
   speakers: { events: SpeakerEvents; said: string[]; closed: boolean }[] = [];
 
-  listen(thresholds: TurnThresholds, events: ListenerEvents) {
+  listen(
+    thresholds: TurnThresholds,
+    events: ListenerEvents,
+    language?: string,
+  ) {
+    this.language = language;
     this.configured_.push(thresholds);
     this.listenerEvents = events;
     return {
@@ -44,7 +52,8 @@ class FakeVendor implements VoiceVendor {
     };
   }
 
-  speaker(events: SpeakerEvents) {
+  speaker(events: SpeakerEvents, voice?: string) {
+    this.voices.push(voice);
     const speaker = { events, said: [] as string[], closed: false };
     this.speakers.push(speaker);
     return {
@@ -154,6 +163,40 @@ describe('VoiceSession', () => {
     ]);
     expect(phone.captions).toEqual(['Oi, Ana! O que você quer treinar hoje?']);
     expect(phone.states).toEqual(['listening', 'speaking', 'listening']);
+  });
+
+  it("speaks and hears in the coach's language, with the coach's voice", async () => {
+    const vendor = new FakeVendor();
+    const model = new FakeModel();
+    new VoiceSession(
+      ana,
+      new FakePhone(),
+      vendor,
+      model,
+      () => undefined,
+      undefined,
+      { coach: coachOf('haley') },
+    );
+    vendor.speakOne();
+
+    expect(vendor.language).toBe('en');
+    expect(vendor.voices).toEqual(['flux-haley-en']);
+    expect(vendor.speaker_.said).toEqual([
+      'Hi, Ana! What would you like to practice today?',
+    ]);
+
+    vendor.turn('StartOfTurn');
+    vendor.turn('EndOfTurn', { transcript: 'Hello', words: words(0, 2) });
+    await settle();
+    const prompt = model.calls[0][0].content;
+    expect(prompt).toContain('Você é Haley, treinadora');
+    expect(prompt).toContain('responda sempre em inglês');
+  });
+
+  it('is Bianca, in Portuguese, when the history names no coach', () => {
+    const { vendor } = call();
+    expect(vendor.language).toBe('pt');
+    expect(vendor.voices).toEqual(['flux-bianca-pt']);
   });
 
   it('on a follow-up, greets the subject and tells the coach the memory', async () => {

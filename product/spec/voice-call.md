@@ -7,8 +7,10 @@ from the RFC [`2026-10-30-voice-pipeline`](../research/2026-10-30-voice-pipeline
 
 ## What the person sees
 
-The home's one accent action is **Começar ligação** (`/ligacao`); the text
-chat stays as **Prefiro escrever**. The call screen shows the agent's
+The home's one accent action starts a call (`/ligacao`; *Fazer minha
+primeira ligação* before the first, *Começar ligação* after, *Continuar
+este assunto* on a call's page, see [call-history.md](./call-history.md));
+the text chat is the chat icon in the top bar. The call screen shows the agent's
 presence (Ouvindo · Pensando · Falando · Microfone desligado), its captions
 (the sentence it is saying, the one before faded) and three controls:
 mute, captions, hang up. No button ends a turn.
@@ -28,6 +30,9 @@ mute, captions, hang up. No button ends a turn.
 | server → phone | binary | the agent's voice, PCM16 24 kHz mono |
 | server → phone | `{type:'interrupt'}` | the person cut in: drop what's queued |
 | server closes | 4401 · 4503 · 1011 · 4000 | not signed in · no voice on this server · dropped · 30-minute cap |
+
+`?follows=<callId>` on the socket continues that call's subject: the coach
+is told the earlier calls on it ([call-history.md](./call-history.md)).
 
 The phone shows Falando while its player still has audio, and a caption
 when its audio starts playing (`PlaybackClock`), not when it arrives.
@@ -54,9 +59,14 @@ agent first says a fixed *"Boa! Deixa eu ver seus números…"*.
 
 ## What is kept
 
-Nothing. The audio is measured and dropped; the conversation lives as long
-as the socket. The server logs each turn's cost and time to first audio;
-PostHog gets one `voice_call` per call with counts and cost, no words.
+The audio is measured and dropped; the conversation lives as long as the
+socket. When it closes, a call in which the person was answered goes to
+the history: the model writes a title, a summary and what to take away
+from the conversation, and only those, the summed numbers, the time and
+the cost are stored; the transcript is not
+([call-history.md](./call-history.md)). The server logs each turn's cost
+and time to first audio; PostHog gets one `voice_call` per call with
+counts, cost and whether it was a follow-up, no words.
 
 ## Files
 

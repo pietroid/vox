@@ -9,16 +9,23 @@ import 'package:l10n/l10n.dart';
 /// {@template call_page}
 /// A call with the agent: you talk, it answers when you stop. No button
 /// ends a turn; the pipeline decides, and Pensando shows that it did.
+///
+/// Hanging up pops the route with whether the call got through.
 /// {@endtemplate}
 class CallPage extends StatelessWidget {
   /// {@macro call_page}
-  const CallPage({super.key});
+  const CallPage({this.follows, super.key});
+
+  /// The id of the call this one continues: the agent remembers it.
+  final String? follows;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          CallCubit(service: context.read<CallService>())..start().ignore(),
+      create: (context) => CallCubit(
+        service: context.read<CallService>(),
+        follows: follows,
+      )..start().ignore(),
       child: const CallView(),
     );
   }
@@ -118,7 +125,9 @@ class CallView extends StatelessWidget {
                           onPressed: () async {
                             await cubit.hangUp();
                             if (context.mounted) {
-                              await Navigator.of(context).maybePop();
+                              await Navigator.of(
+                                context,
+                              ).maybePop(cubit.connected);
                             }
                           },
                         ),

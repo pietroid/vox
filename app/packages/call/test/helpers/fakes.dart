@@ -69,8 +69,12 @@ class FakeCallService implements CallService {
   final FakeMicrophone mic;
   final speaker = FakeVoicePlayer();
 
+  /// The call each dial continued, in order.
+  final dialed = <String?>[];
+
   @override
-  Future<VoiceLine> dial() async {
+  Future<VoiceLine> dial({String? follows}) async {
+    dialed.add(follows);
     if (fails != null) throw fails!;
     return line;
   }

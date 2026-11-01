@@ -21,8 +21,12 @@ class CallCubit extends Cubit<CallState> {
   /// {@macro call_cubit}
   CallCubit({
     required this._service,
+    this.follows,
     CallState initial = const CallState(),
   }) : super(initial);
+
+  /// The id of the call this one continues, if it does.
+  final String? follows;
 
   /// How often the clock, the rings and the timer move: ~20 times a second.
   static const tick = Duration(milliseconds: 50);
@@ -39,6 +43,10 @@ class CallCubit extends Cubit<CallState> {
   ServerPhase _server = ServerPhase.listening;
   double _micLevel = 0;
   bool _ended = false;
+  bool _connected = false;
+
+  /// Whether the call got through, so there is something for the history.
+  bool get connected => _connected;
 
   /// Dials: asks for the mic, opens the socket, starts listening.
   Future<void> start() async {
@@ -53,7 +61,7 @@ class CallCubit extends Cubit<CallState> {
       return;
     }
     try {
-      final line = await _service.dial();
+      final line = await _service.dial(follows: follows);
       if (_ended) {
         await line.close();
         return;
@@ -69,6 +77,7 @@ class CallCubit extends Cubit<CallState> {
       await _release();
       return;
     }
+    _connected = true;
     _started.start();
     _ticker = Timer.periodic(tick, (_) => _onTick());
     emit(state.copyWith(phase: CallPhase.listening));

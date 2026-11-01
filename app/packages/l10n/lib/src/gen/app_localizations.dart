@@ -131,18 +131,6 @@ abstract class AppLocalizations {
   /// **'Olá'**
   String get homeGreetingAnonymous;
 
-  /// No description provided for @homeEmptyTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'Tudo pronto'**
-  String get homeEmptyTitle;
-
-  /// No description provided for @homeEmptyBody.
-  ///
-  /// In pt, this message translates to:
-  /// **'Esta tela está em branco. É aqui que o app começa.'**
-  String get homeEmptyBody;
-
   /// No description provided for @homeSignOut.
   ///
   /// In pt, this message translates to:
@@ -185,29 +173,11 @@ abstract class AppLocalizations {
   /// **'O assistente não respondeu. Tente de novo.'**
   String get assistantFailed;
 
-  /// No description provided for @homeCallTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'Pronto para ensaiar?'**
-  String get homeCallTitle;
-
-  /// No description provided for @homeCallBody.
-  ///
-  /// In pt, this message translates to:
-  /// **'Ligue e fale como falaria de verdade. O Vox responde quando você terminar.'**
-  String get homeCallBody;
-
   /// No description provided for @homeCallStart.
   ///
   /// In pt, this message translates to:
   /// **'Começar ligação'**
   String get homeCallStart;
-
-  /// No description provided for @homeWrite.
-  ///
-  /// In pt, this message translates to:
-  /// **'Prefiro escrever'**
-  String get homeWrite;
 
   /// No description provided for @callTitle.
   ///
@@ -292,6 +262,300 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'O Vox precisa do microfone para a ligação. Permita o acesso nos Ajustes do telefone.'**
   String get callMicrophoneDenied;
+
+  /// The top bar's icon that opens the written chat.
+  ///
+  /// In pt, this message translates to:
+  /// **'Conversar por escrito'**
+  String get homeOpenAssistant;
+
+  /// The first-run home's headline, before the first call.
+  ///
+  /// In pt, this message translates to:
+  /// **'Vamos ouvir sua voz'**
+  String get homeOnboardingTitle;
+
+  /// No description provided for @homeOnboardingBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Na primeira ligação, você fala por uns três minutos e o Vox devolve seu ritmo, suas pausas e o que treinar.'**
+  String get homeOnboardingBody;
+
+  /// No description provided for @homeGoalQuestion.
+  ///
+  /// In pt, this message translates to:
+  /// **'O que te traz aqui?'**
+  String get homeGoalQuestion;
+
+  /// No description provided for @homeGoalHint.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escolha um. A primeira ligação começa por aí.'**
+  String get homeGoalHint;
+
+  /// No description provided for @homeFirstCallStart.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fazer minha primeira ligação'**
+  String get homeFirstCallStart;
+
+  /// No description provided for @homeFirstCallNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'Uns três minutos · só você e o Vox'**
+  String get homeFirstCallNote;
+
+  /// No description provided for @goalPresentations.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apresentações'**
+  String get goalPresentations;
+
+  /// No description provided for @goalInterviews.
+  ///
+  /// In pt, this message translates to:
+  /// **'Entrevistas'**
+  String get goalInterviews;
+
+  /// No description provided for @goalMeetings.
+  ///
+  /// In pt, this message translates to:
+  /// **'Reuniões'**
+  String get goalMeetings;
+
+  /// No description provided for @goalTeaching.
+  ///
+  /// In pt, this message translates to:
+  /// **'Aulas'**
+  String get goalTeaching;
+
+  /// No description provided for @goalRecording.
+  ///
+  /// In pt, this message translates to:
+  /// **'Podcast e vídeo'**
+  String get goalRecording;
+
+  /// No description provided for @goalCalm.
+  ///
+  /// In pt, this message translates to:
+  /// **'Falar com calma'**
+  String get goalCalm;
+
+  /// No description provided for @goalOther.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outra coisa'**
+  String get goalOther;
+
+  /// What the first call does for this goal.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox vai pedir que você apresente um tema do seu trabalho em um minuto, como numa reunião de verdade.'**
+  String get goalPresentationsPlan;
+
+  /// No description provided for @goalInterviewsPlan.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox faz de entrevistador: uma pergunta clássica, sua resposta, e o que ela passou.'**
+  String get goalInterviewsPlan;
+
+  /// No description provided for @goalMeetingsPlan.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox simula uma reunião e pede sua opinião sobre um tema. Você treina falar sem rodeios.'**
+  String get goalMeetingsPlan;
+
+  /// No description provided for @goalTeachingPlan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você explica um assunto que conhece como se fosse para a turma, e o Vox mede seu ritmo.'**
+  String get goalTeachingPlan;
+
+  /// No description provided for @goalRecordingPlan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você grava uma abertura de episódio, e o Vox ouve como ela soaria para quem escuta.'**
+  String get goalRecordingPlan;
+
+  /// No description provided for @goalCalmPlan.
+  ///
+  /// In pt, this message translates to:
+  /// **'Uma conversa leve, sem pressa. O Vox mostra onde sua fala acelera.'**
+  String get goalCalmPlan;
+
+  /// No description provided for @goalOtherPlan.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox começa perguntando o que você quer treinar, e segue a partir daí.'**
+  String get goalOtherPlan;
+
+  /// The home's call-out right after the first call.
+  ///
+  /// In pt, this message translates to:
+  /// **'Primeira ligação feita'**
+  String get homeFirstDoneTitle;
+
+  /// No description provided for @homeFirstDoneBody.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seu resumo está logo abaixo. Ligue de novo quando quiser: o Vox lembra do que vocês conversaram.'**
+  String get homeFirstDoneBody;
+
+  /// The home's call-out once there is a history.
+  ///
+  /// In pt, this message translates to:
+  /// **'Pronto para a próxima?'**
+  String get homeNextTitle;
+
+  /// The last call's first learning, under the call-out.
+  ///
+  /// In pt, this message translates to:
+  /// **'Da última vez: {learning}'**
+  String homeNextLastLearning(String learning);
+
+  /// The call-out's line when the last call left no learning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligue quando quiser: o Vox lembra do que vocês conversaram.'**
+  String get homeNextBody;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suas ligações'**
+  String get historyTitle;
+
+  /// While the server writes the notes of the call that just ended.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escrevendo o resumo da sua ligação…'**
+  String get historySummarizing;
+
+  /// No description provided for @historyLoadFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não deu para carregar suas ligações.'**
+  String get historyLoadFailed;
+
+  /// No description provided for @historyRetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar de novo'**
+  String get historyRetry;
+
+  /// No description provided for @callLoadFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não deu para abrir esta ligação.'**
+  String get callLoadFailed;
+
+  /// Under the history's title: how many calls and how long they took together.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count, plural, =1{1 ligação} other{{count} ligações}} · {duration}'**
+  String historyTotals(int count, String duration);
+
+  /// The badge on a call the person has not opened yet.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova'**
+  String get callNew;
+
+  /// No description provided for @callToday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Hoje, {time}'**
+  String callToday(String time);
+
+  /// No description provided for @callYesterday.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ontem, {time}'**
+  String callYesterday(String time);
+
+  /// No description provided for @callOnDay.
+  ///
+  /// In pt, this message translates to:
+  /// **'{day}, {time}'**
+  String callOnDay(String day, String time);
+
+  /// No description provided for @callMinutes.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min'**
+  String callMinutes(int minutes);
+
+  /// No description provided for @callMinutesSeconds.
+  ///
+  /// In pt, this message translates to:
+  /// **'{minutes} min {seconds} s'**
+  String callMinutesSeconds(int minutes, int seconds);
+
+  /// What a call cost, in dollars, the amount already written with a comma.
+  ///
+  /// In pt, this message translates to:
+  /// **'US\$ {amount}'**
+  String callCost(String amount);
+
+  /// On a call that follows up an earlier one: which call on the subject it is.
+  ///
+  /// In pt, this message translates to:
+  /// **'{index}ª do assunto'**
+  String callSubjectIndex(int index);
+
+  /// No description provided for @callDetailSummary.
+  ///
+  /// In pt, this message translates to:
+  /// **'Resumo'**
+  String get callDetailSummary;
+
+  /// No description provided for @callDetailLearnings.
+  ///
+  /// In pt, this message translates to:
+  /// **'O que levar daqui'**
+  String get callDetailLearnings;
+
+  /// No description provided for @callDetailNumbers.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seus números'**
+  String get callDetailNumbers;
+
+  /// No description provided for @metricPace.
+  ///
+  /// In pt, this message translates to:
+  /// **'palavras/min'**
+  String get metricPace;
+
+  /// No description provided for @metricPauses.
+  ///
+  /// In pt, this message translates to:
+  /// **'pausas longas'**
+  String get metricPauses;
+
+  /// No description provided for @metricHesitations.
+  ///
+  /// In pt, this message translates to:
+  /// **'hesitações'**
+  String get metricHesitations;
+
+  /// How a number moved since the first call on the subject, signed.
+  ///
+  /// In pt, this message translates to:
+  /// **'{delta} desde a 1ª'**
+  String metricSinceFirst(String delta);
+
+  /// The detail's one button: a new call that picks up this one.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar este assunto'**
+  String get callFollowUpStart;
+
+  /// No description provided for @callFollowUpNote.
+  ///
+  /// In pt, this message translates to:
+  /// **'O Vox lembra desta conversa e começa de onde vocês pararam.'**
+  String get callFollowUpNote;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

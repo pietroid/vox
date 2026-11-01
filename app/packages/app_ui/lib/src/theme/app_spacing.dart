@@ -72,6 +72,12 @@ abstract final class AppSpacing {
   /// The default icon size.
   static const iconSize = 24.0;
 
+  /// A small icon, beside a caption or a chip label.
+  static const iconSmall = 16.0;
+
+  /// The round number in front of an item of a numbered list.
+  static const badge = 28.0;
+
   /// The widest a content column ever gets, so text stays readable on web.
   static const maxContentWidth = 560.0;
 }

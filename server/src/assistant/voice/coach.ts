@@ -10,10 +10,13 @@ import { SpeechMetrics } from './speech-metrics';
 /** A turn this long or longer is a take: it gets measured for the coach. */
 export const TAKE_SECONDS = 15;
 
-/** The system prompt of a call. */
-export function coachPrompt(user: AuthUser): string {
+/**
+ * The system prompt of a call. [memory] is what the history adds: the
+ * person's goal, or the earlier calls on the subject a follow-up continues.
+ */
+export function coachPrompt(user: AuthUser, memory = ''): string {
   const name = user.name.split(' ')[0] || user.name;
-  return [
+  const lines = [
     'Você é o Vox, um treinador de fala e apresentação, numa ligação de voz.',
     `Você está falando com ${name}. Tudo o que você escreve é falado em voz alta.`,
     'Fale como numa ligação: frases curtas, em português do Brasil, sem listas, sem markdown, sem emojis.',
@@ -24,7 +27,9 @@ export function coachPrompt(user: AuthUser): string {
     'A transcrição é automática e pode trocar palavras: nunca aponte uma palavra estranha como erro de dicção, e só cite trechos que fazem sentido.',
     'Comece pelo ponto mais importante: um elogio concreto e uma coisa a mudar, com o trecho em que ela aparece.',
     'Para falas curtas, apenas converse: entenda o que a pessoa quer treinar e conduza o treino.',
-  ].join('\n');
+  ];
+  if (memory.trim() !== '') lines.push('', memory.trim());
+  return lines.join('\n');
 }
 
 /** The person's turn as the model reads it: the words, then the numbers. */

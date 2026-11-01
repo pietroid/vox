@@ -156,6 +156,44 @@ describe('VoiceSession', () => {
     expect(phone.states).toEqual(['listening', 'speaking', 'listening']);
   });
 
+  it('on a follow-up, greets the subject and tells the coach the memory', async () => {
+    const vendor = new FakeVendor();
+    const model = new FakeModel();
+    const session = new VoiceSession(
+      ana,
+      new FakePhone(),
+      vendor,
+      model,
+      () => undefined,
+      undefined,
+      { memory: 'Da última vez: começar pelo resultado.', followUp: true },
+    );
+    vendor.speakOne();
+    expect(vendor.speaker_.said).toEqual([
+      'Oi, Ana! Vamos continuar de onde paramos?',
+    ]);
+
+    vendor.turn('StartOfTurn');
+    vendor.turn('EndOfTurn', {
+      transcript: 'Bom dia a todos…',
+      words: words(0, 30),
+    });
+    await settle();
+    vendor.speakOne();
+    vendor.speakOne();
+
+    expect(model.calls[0][0].content).toContain(
+      'Da última vez: começar pelo resultado.',
+    );
+    // What the history is handed when the call ends.
+    expect(session.takes).toHaveLength(1);
+    expect(session.conversation.map((it) => it.role)).toEqual([
+      'assistant',
+      'user',
+      'assistant',
+    ]);
+  });
+
   it('answers a turn sentence by sentence, each caption before its audio', async () => {
     const { vendor, model, phone } = call();
     model.replies.push(['Boa ideia. Comece ', 'quando quiser.']);

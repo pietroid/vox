@@ -31,6 +31,8 @@ export interface SpeechMetrics {
   pauseShare: number;
   /** Voiced time with no word on it: "é…", "hã…". */
   hesitationS: number;
+  /** How many such stretches there were. */
+  hesitations: number;
   /** The voice's median pitch, when there was audio to measure. */
   pitchMedianHz?: number;
   /** p90 − p10 around the median, in semitones: low means monotone. */
@@ -124,6 +126,7 @@ export function measure(words: TimedWord[], track?: VoiceTrack): SpeechMetrics {
       longestPauseS: 0,
       pauseShare: 0,
       hesitationS: 0,
+      hesitations: 0,
     };
   }
   const from = timed[0].start;
@@ -132,6 +135,7 @@ export function measure(words: TimedWord[], track?: VoiceTrack): SpeechMetrics {
   const voice = track?.voiced(from, to);
   const pauses: number[] = [];
   let hesitation = 0;
+  let hesitations = 0;
 
   if (voice === undefined || voice.mask.length === 0) {
     // Words alone: a pause is a gap between them.
@@ -153,6 +157,7 @@ export function measure(words: TimedWord[], track?: VoiceTrack): SpeechMetrics {
       for (const run of runs(voice.mask.slice(Math.max(0, a), b), true)) {
         if (run.length * HOP_S >= MIN_HESITATION) {
           hesitation += run.length * HOP_S;
+          hesitations++;
         }
       }
     }
@@ -170,6 +175,7 @@ export function measure(words: TimedWord[], track?: VoiceTrack): SpeechMetrics {
     longestPauseS: round(Math.max(0, ...pauses), 2),
     pauseShare: round(Math.min(1, paused / span), 2),
     hesitationS: round(hesitation, 1),
+    hesitations,
     ...(track ? pitchStats(track, from, to) : {}),
   };
 }

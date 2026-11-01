@@ -20,6 +20,34 @@ void main() {
 
       expect(cubit.state.phase, CallPhase.listening);
       expect(service.line.sent, hasLength(1));
+      expect(cubit.connected, isTrue);
+      expect(service.dialed, [null]);
+    });
+
+    test('a follow-up dials with the call it continues', () async {
+      final service = FakeCallService();
+      final cubit = CallCubit(service: service, follows: 'c1');
+      addTearDown(cubit.close);
+
+      await cubit.start();
+
+      expect(service.dialed, ['c1']);
+    });
+
+    test('the socket says which call a follow-up continues', () {
+      final service = ServerCallService(
+        apiBaseUrl: 'https://vox.example/api',
+        token: () async => null,
+      );
+
+      expect(
+        service.uri(follows: 'c1').toString(),
+        'wss://vox.example/api/assistant/voice?follows=c1',
+      );
+      expect(
+        service.uri().toString(),
+        'wss://vox.example/api/assistant/voice',
+      );
     });
 
     test('says why there is no call', () async {
@@ -31,6 +59,7 @@ void main() {
         final cubit = CallCubit(service: service);
         await cubit.start();
         expect(cubit.state.phase, phase);
+        expect(cubit.connected, isFalse);
         await cubit.close();
       }
     });

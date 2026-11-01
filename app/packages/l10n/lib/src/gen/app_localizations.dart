@@ -131,18 +131,6 @@ abstract class AppLocalizations {
   /// **'Olá'**
   String get homeGreetingAnonymous;
 
-  /// No description provided for @homeEmptyTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'Tudo pronto'**
-  String get homeEmptyTitle;
-
-  /// No description provided for @homeEmptyBody.
-  ///
-  /// In pt, this message translates to:
-  /// **'Esta tela está em branco. É aqui que o app começa.'**
-  String get homeEmptyBody;
-
   /// No description provided for @homeSignOut.
   ///
   /// In pt, this message translates to:
@@ -185,29 +173,11 @@ abstract class AppLocalizations {
   /// **'O assistente não respondeu. Tente de novo.'**
   String get assistantFailed;
 
-  /// No description provided for @homeCallTitle.
-  ///
-  /// In pt, this message translates to:
-  /// **'Pronto para ensaiar?'**
-  String get homeCallTitle;
-
-  /// No description provided for @homeCallBody.
-  ///
-  /// In pt, this message translates to:
-  /// **'Ligue e fale como falaria de verdade. O Vox responde quando você terminar.'**
-  String get homeCallBody;
-
   /// No description provided for @homeCallStart.
   ///
   /// In pt, this message translates to:
   /// **'Começar ligação'**
   String get homeCallStart;
-
-  /// No description provided for @homeWrite.
-  ///
-  /// In pt, this message translates to:
-  /// **'Prefiro escrever'**
-  String get homeWrite;
 
   /// No description provided for @callTitle.
   ///
@@ -443,11 +413,41 @@ abstract class AppLocalizations {
   /// **'Da última vez: {learning}'**
   String homeNextLastLearning(String learning);
 
+  /// The call-out's line when the last call left no learning.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligue quando quiser: o Vox lembra do que vocês conversaram.'**
+  String get homeNextBody;
+
   /// No description provided for @historyTitle.
   ///
   /// In pt, this message translates to:
   /// **'Suas ligações'**
   String get historyTitle;
+
+  /// While the server writes the notes of the call that just ended.
+  ///
+  /// In pt, this message translates to:
+  /// **'Escrevendo o resumo da sua ligação…'**
+  String get historySummarizing;
+
+  /// No description provided for @historyLoadFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não deu para carregar suas ligações.'**
+  String get historyLoadFailed;
+
+  /// No description provided for @historyRetry.
+  ///
+  /// In pt, this message translates to:
+  /// **'Tentar de novo'**
+  String get historyRetry;
+
+  /// No description provided for @callLoadFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não deu para abrir esta ligação.'**
+  String get callLoadFailed;
 
   /// Under the history's title: how many calls and how long they took together.
   ///

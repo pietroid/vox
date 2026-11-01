@@ -32,12 +32,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get homeGreetingAnonymous => 'Olá';
 
   @override
-  String get homeEmptyTitle => 'Tudo pronto';
-
-  @override
-  String get homeEmptyBody => 'Esta tela está em branco. É aqui que o app começa.';
-
-  @override
   String get homeSignOut => 'Sair';
 
   @override
@@ -59,16 +53,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get assistantFailed => 'O assistente não respondeu. Tente de novo.';
 
   @override
-  String get homeCallTitle => 'Pronto para ensaiar?';
-
-  @override
-  String get homeCallBody => 'Ligue e fale como falaria de verdade. O Vox responde quando você terminar.';
-
-  @override
   String get homeCallStart => 'Começar ligação';
-
-  @override
-  String get homeWrite => 'Prefiro escrever';
 
   @override
   String get callTitle => 'Assistente';
@@ -190,7 +175,22 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get homeNextBody => 'Ligue quando quiser: o Vox lembra do que vocês conversaram.';
+
+  @override
   String get historyTitle => 'Suas ligações';
+
+  @override
+  String get historySummarizing => 'Escrevendo o resumo da sua ligação…';
+
+  @override
+  String get historyLoadFailed => 'Não deu para carregar suas ligações.';
+
+  @override
+  String get historyRetry => 'Tentar de novo';
+
+  @override
+  String get callLoadFailed => 'Não deu para abrir esta ligação.';
 
   @override
   String historyTotals(int count, String duration) {

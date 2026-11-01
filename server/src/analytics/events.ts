@@ -11,6 +11,8 @@
  */
 const EVENTS: Record<string, string> = {
   'POST /assistant/chat': 'assistant_turn',
+  'POST /calls/:id/seen': 'call_opened',
+  'PUT /users/me/goal': 'goal_chosen',
 };
 
 /** The route a request matched, without the `/api` prefix (`/items/:id`). */

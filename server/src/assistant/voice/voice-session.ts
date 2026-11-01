@@ -35,9 +35,19 @@ import {
  * - `{type:'interrupt'}`: the person cut in; drop what's queued
  *
  * The phone sends binary PCM16 16 kHz mono, and `{type:'mute', muted}`.
- * Nothing is stored: the audio is dropped as it's measured, and the
- * conversation lives as long as the socket.
+ * The audio is dropped as it's measured, and the conversation lives as
+ * long as the socket: when it closes, the gateway hands [conversation] and
+ * [takes] to the history, which keeps only the notes the model writes from
+ * them and the numbers.
  */
+
+/** What a call starts with, from the history. */
+export interface SessionBrief {
+  /** Added to the coach's prompt: the goal, or the earlier calls. */
+  memory?: string;
+  /** The call continues a subject: the greeting says so. */
+  followUp?: boolean;
+}
 
 /** The phone's end of the call. */
 export interface Phone {
@@ -132,6 +142,7 @@ export class VoiceSession {
   private _turnStart?: number;
   private _long = false;
   private _baseline?: SpeechMetrics;
+  private readonly _takes: SpeechMetrics[] = [];
   private _reply?: Reply;
 
   private readonly _report: SessionReport = {
@@ -149,6 +160,7 @@ export class VoiceSession {
     private readonly _model: ReplyModel,
     private readonly _log: (line: string) => void,
     private readonly _now: () => number = () => performance.now(),
+    private readonly _brief: SessionBrief = {},
   ) {
     this._listener = _vendor.listen(SHORT_TURN, {
       onTurn: (event) => this._onTurn(event),
@@ -166,6 +178,16 @@ export class VoiceSession {
 
   get report(): SessionReport {
     return { ...this._report, usd: round(this._usd(), 4) };
+  }
+
+  /** What was said and answered, in order. */
+  get conversation(): ChatMessage[] {
+    return [...this._history];
+  }
+
+  /** Each take's numbers, in order. */
+  get takes(): SpeechMetrics[] {
+    return [...this._takes];
   }
 
   /** PCM from the phone's mic. */
@@ -284,6 +306,7 @@ export class VoiceSession {
       span >= TAKE_SECONDS ? measure(this._words, this._track) : undefined;
     if (metrics) {
       this._baseline ??= metrics;
+      this._takes.push(metrics);
       this._log(
         `take measured (${trigger ?? 'model'}): ${JSON.stringify(metrics)}`,
       );
@@ -291,7 +314,7 @@ export class VoiceSession {
     if (span >= ACKNOWLEDGE_SECONDS) this._say(reply, ACKNOWLEDGEMENT);
 
     const messages: ChatMessage[] = [
-      { role: 'system', content: coachPrompt(this._user) },
+      { role: 'system', content: coachPrompt(this._user, this._brief.memory) },
       ...this._history.slice(-HISTORY),
       {
         role: 'user',
@@ -341,7 +364,12 @@ export class VoiceSession {
       endedAt: this._now(),
     };
     this._reply = reply;
-    this._say(reply, `Oi, ${name}! O que você quer treinar hoje?`);
+    this._say(
+      reply,
+      this._brief.followUp
+        ? `Oi, ${name}! Vamos continuar de onde paramos?`
+        : `Oi, ${name}! O que você quer treinar hoje?`,
+    );
   }
 
   private _say(reply: Reply, sentence: string): void {

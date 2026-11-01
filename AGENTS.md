@@ -46,12 +46,14 @@ app/
     app_ui/             the design system: AppBrand, tokens, theme, widgets
     auth/               Better Auth client: Google sign-in, token store
     call/               the voice call: screen, cubit, socket, mic, player
+    call_history/       first-run home, the history of calls, a call's page
     l10n/               every user-facing string (pt-BR)
 server/
   src/
     analytics/          PostHog: the provider, the route → event table
     assistant/          OpenRouter client, the assistant's routes
       voice/            the call: WebSocket gateway, Deepgram, metrics, coach
+    calls/              the history of calls, the goal, a follow-up's memory
     auth/               Better Auth instance + SessionGuard
     db/                 Drizzle schema + pool + boot-time migrations
     users/              /users/me
@@ -116,10 +118,22 @@ signed in on the upgrade) relays the phone's mic to Deepgram Flux STT,
 measures each take in code (`speech-metrics.ts`), streams the model's reply
 sentence by sentence into Flux TTS, and sends the phone `state`, `caption`
 and audio. **Flux ends turns, never a button**; after 10 s only a 3 s
-silence does. Nothing is stored. Off without `DEEPGRAM_API_KEY` (closes
-4503). Server in `server/src/assistant/voice/`, app in
+silence does. Audio and transcript are never stored. Off without
+`DEEPGRAM_API_KEY` (closes 4503). Server in `server/src/assistant/voice/`, app in
 `app/packages/call/`; contract and rules in
 [product/spec/voice-call.md](./product/spec/voice-call.md).
+
+## The history of calls
+
+The home is an invitation (*O que te traz aqui?*, one first-call button)
+until a call is kept, then the history. When a call's socket closes, the
+server keeps it if the person was answered: the model writes a title, a
+summary and up to three learnings once, from the conversation, and **only
+those notes, the numbers, the time and the cost are stored**, never the
+transcript. *Continuar este assunto* dials `?follows=<id>`, and the coach is
+told the subject's last 3 calls. Server in `server/src/calls/`, app in
+`app/packages/call_history/`; routes and rules in
+[product/spec/call-history.md](./product/spec/call-history.md).
 
 ## The design system
 

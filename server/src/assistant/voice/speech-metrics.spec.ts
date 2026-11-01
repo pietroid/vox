@@ -75,7 +75,9 @@ describe('measure', () => {
       { word: 'assim', start: 2.6, end: 3.6 },
     ];
 
-    expect(measure(words, trackOf(pcm)).hesitationS).toBeCloseTo(1, 1);
+    const metrics = measure(words, trackOf(pcm));
+    expect(metrics.hesitationS).toBeCloseTo(1, 1);
+    expect(metrics.hesitations).toBe(1);
   });
 
   it('measures pitch, the same whatever the chunk size', () => {

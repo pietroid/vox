@@ -1,4 +1,13 @@
-import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  doublePrecision,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+} from 'drizzle-orm/pg-core';
 
 /**
  * Everything the app keeps, in one Postgres database.
@@ -91,4 +100,61 @@ export const verification = pgTable(
 // The app
 // ---------------------------------------------------------------------------
 
-export const schema = { user, session, account, verification };
+/** What brought a person to Vox, asked before their first call. */
+export const userGoal = pgTable('user_goal', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  /** A `SpeakingGoal` key: `presentations`, `interviews`… */
+  goal: text('goal').notNull(),
+  updatedAt: updatedAt(),
+});
+
+/** A call's numbers, as `calls/call-metrics.ts` sums its takes. */
+export interface StoredCallMetrics {
+  wordsPerMinute: number;
+  longPauses: number;
+  hesitations: number;
+}
+
+/**
+ * One finished call: when, how long, what it cost, and what the model
+ * wrote about it. Never the audio, never the transcript.
+ *
+ * Calls on one subject share `subject_id` (the first call's id); a
+ * follow-up names the call it continues in `follows_call_id`.
+ */
+export const call = pgTable(
+  'call',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull(),
+    durationMs: integer('duration_ms').notNull(),
+    costUsd: doublePrecision('cost_usd').notNull(),
+    title: text('title').notNull(),
+    summary: text('summary').notNull(),
+    learnings: jsonb('learnings').$type<string[]>().notNull(),
+    metrics: jsonb('metrics').$type<StoredCallMetrics>(),
+    subjectId: text('subject_id').notNull(),
+    subjectIndex: integer('subject_index').notNull(),
+    followsCallId: text('follows_call_id'),
+    seenAt: timestamp('seen_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    index('call_user_started_idx').on(table.userId, table.startedAt),
+    index('call_subject_idx').on(table.userId, table.subjectId),
+  ],
+);
+
+export const schema = {
+  user,
+  session,
+  account,
+  verification,
+  userGoal,
+  call,
+};

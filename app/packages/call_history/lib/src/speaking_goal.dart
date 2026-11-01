@@ -30,6 +30,14 @@ enum SpeakingGoal {
   /// The glyph on its chip.
   final AppIconData icon;
 
+  /// The goal the server keeps as [key] (its [name]), if it is one.
+  static SpeakingGoal? fromKey(String? key) {
+    for (final goal in values) {
+      if (goal.name == key) return goal;
+    }
+    return null;
+  }
+
   /// Its name on the chip.
   String label(AppLocalizations l10n) => switch (this) {
     presentations => l10n.goalPresentations,

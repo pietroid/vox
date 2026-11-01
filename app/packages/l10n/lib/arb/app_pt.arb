@@ -17,8 +17,6 @@
     }
   },
   "homeGreetingAnonymous": "Olá",
-  "homeEmptyTitle": "Tudo pronto",
-  "homeEmptyBody": "Esta tela está em branco. É aqui que o app começa.",
   "homeSignOut": "Sair",
   "assistantOpen": "Falar com o assistente",
   "assistantTitle": "Assistente",
@@ -26,10 +24,7 @@
   "assistantSend": "Enviar",
   "assistantEmpty": "Como posso ajudar?",
   "assistantFailed": "O assistente não respondeu. Tente de novo.",
-  "homeCallTitle": "Pronto para ensaiar?",
-  "homeCallBody": "Ligue e fale como falaria de verdade. O Vox responde quando você terminar.",
   "homeCallStart": "Começar ligação",
-  "homeWrite": "Prefiro escrever",
   "callTitle": "Assistente",
   "callConnecting": "Conectando…",
   "callListening": "Ouvindo",
@@ -92,7 +87,18 @@
       }
     }
   },
+  "homeNextBody": "Ligue quando quiser: o Vox lembra do que vocês conversaram.",
+  "@homeNextBody": {
+    "description": "The call-out's line when the last call left no learning."
+  },
   "historyTitle": "Suas ligações",
+  "historySummarizing": "Escrevendo o resumo da sua ligação…",
+  "@historySummarizing": {
+    "description": "While the server writes the notes of the call that just ended."
+  },
+  "historyLoadFailed": "Não deu para carregar suas ligações.",
+  "historyRetry": "Tentar de novo",
+  "callLoadFailed": "Não deu para abrir esta ligação.",
   "historyTotals": "{count, plural, =1{1 ligação} other{{count} ligações}} · {duration}",
   "@historyTotals": {
     "description": "Under the history's title: how many calls and how long they took together.",

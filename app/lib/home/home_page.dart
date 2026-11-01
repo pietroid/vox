@@ -19,9 +19,43 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CallHistoryCubit(),
+      create: (context) => CallHistoryCubit(
+        repository: context.read<CallHistoryRepository>(),
+      )..load().ignore(),
       child: const HomeView(),
     );
+  }
+}
+
+/// Starts a call from the home, [follows] another or fresh, and reads the
+/// history again once it ends.
+Future<void> startCall(BuildContext context, {String? follows}) async {
+  final cubit = context.read<CallHistoryCubit>();
+  final connected = await context.push<bool>(
+    follows == null
+        ? '/ligacao'
+        : Uri(
+            path: '/ligacao',
+            queryParameters: {'follows': follows},
+          ).toString(),
+  );
+  // A back gesture says nothing: the call may have happened.
+  await cubit.afterCall(connected: connected ?? true);
+}
+
+/// Opens [call]'s page; its "Continuar este assunto" comes back here as
+/// `true`, and the follow-up starts from the home, which then reloads.
+Future<void> openCall(BuildContext context, CallRecord call) async {
+  final cubit = context.read<CallHistoryCubit>()..markSeen(call.id).ignore();
+  final followUp = await context.push<bool>(
+    '/ligacoes/${call.id}',
+    extra: call,
+  );
+  if (followUp == true && context.mounted) {
+    await startCall(context, follows: call.id);
+  } else if (!cubit.isClosed) {
+    // The detail may have been opened on a stale copy.
+    cubit.load().ignore();
   }
 }
 
@@ -65,9 +99,33 @@ class HomeView extends StatelessWidget {
         ],
       ),
       body: BlocBuilder<CallHistoryCubit, CallHistoryState>(
-        builder: (context, state) => state.isFirstRun
-            ? _FirstCall(goal: state.goal)
-            : _History(calls: state.calls, now: now ?? DateTime.now()),
+        builder: (context, state) => switch (state) {
+          CallHistoryState(isFirstRun: true, summarizing: true) =>
+            const _Summarizing(),
+          CallHistoryState(
+            isFirstRun: true,
+            status: CallHistoryStatus.loading,
+          ) =>
+            const Center(child: _Spinner()),
+          CallHistoryState(
+            isFirstRun: true,
+            status: CallHistoryStatus.failed,
+          ) =>
+            AppEmptyState(
+              title: l10n.historyLoadFailed,
+              action: AppButton.text(
+                onPressed: () =>
+                    context.read<CallHistoryCubit>().load().ignore(),
+                text: l10n.historyRetry,
+              ),
+            ),
+          CallHistoryState(isFirstRun: true) => _FirstCall(goal: state.goal),
+          _ => _History(
+            calls: state.calls,
+            summarizing: state.summarizing,
+            now: now ?? DateTime.now(),
+          ),
+        },
       ),
     );
   }
@@ -130,7 +188,7 @@ class _FirstCall extends StatelessWidget {
               children: [
                 AppButton.icon(
                   expand: true,
-                  onPressed: () => context.push('/ligacao'),
+                  onPressed: () => startCall(context),
                   icon: const AppIcon(
                     iconData: AppIcons.call,
                     color: AppColors.onAccent,
@@ -149,9 +207,14 @@ class _FirstCall extends StatelessWidget {
 }
 
 class _History extends StatelessWidget {
-  const _History({required this.calls, required this.now});
+  const _History({
+    required this.calls,
+    required this.summarizing,
+    required this.now,
+  });
 
   final List<CallRecord> calls;
+  final bool summarizing;
   final DateTime now;
 
   @override
@@ -160,6 +223,7 @@ class _History extends StatelessWidget {
     final last = calls.first;
     final total = calls.fold(Duration.zero, (sum, c) => sum + c.duration);
     final firstDone = calls.length == 1;
+    final lesson = last.learnings.isEmpty ? null : last.learnings.first;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -182,13 +246,15 @@ class _History extends StatelessWidget {
               Text(
                 firstDone
                     ? l10n.homeFirstDoneBody
-                    : l10n.homeNextLastLearning(last.learnings.first),
+                    : lesson == null
+                    ? l10n.homeNextBody
+                    : l10n.homeNextLastLearning(lesson),
                 style: AppTypography.label.copyWith(color: AppColors.ink),
               ),
               const SizedBox(height: AppSpacing.s4),
               AppButton.icon(
                 expand: true,
-                onPressed: () => context.push('/ligacao'),
+                onPressed: () => startCall(context),
                 icon: const AppIcon(
                   iconData: AppIcons.call,
                   color: AppColors.onAccent,
@@ -206,16 +272,72 @@ class _History extends StatelessWidget {
           style: AppTypography.caption,
         ),
         const SizedBox(height: AppSpacing.s4),
+        if (summarizing)
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.s3),
+            child: AppCard(
+              child: Row(
+                children: [
+                  const _Spinner(),
+                  const SizedBox(width: AppSpacing.s3),
+                  Expanded(
+                    child: Text(
+                      l10n.historySummarizing,
+                      style: AppTypography.label,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         for (final call in calls)
           Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.s3),
             child: CallCard(
               call: call,
               now: now,
-              onTap: () => context.push('/ligacoes/${call.id}'),
+              onTap: () => openCall(context, call),
             ),
           ),
       ],
+    );
+  }
+}
+
+/// The first call just ended and its notes are being written.
+class _Summarizing extends StatelessWidget {
+  const _Summarizing();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.s6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const AppPresence(state: AppPresenceState.thinking),
+            const SizedBox(height: AppSpacing.s4),
+            Text(
+              context.l10n.historySummarizing,
+              textAlign: TextAlign.center,
+              style: AppTypography.label,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Spinner extends StatelessWidget {
+  const _Spinner();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox.square(
+      dimension: AppSpacing.s5,
+      child: CircularProgressIndicator(strokeWidth: 2),
     );
   }
 }

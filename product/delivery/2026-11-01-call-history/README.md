@@ -1,6 +1,6 @@
 # The first call, then the history of calls
 
-2026-11-01 · delivery (draft: design) · track: **mockup**
+2026-11-01 · delivery · track: **mockup**
 
 ## 1. The prompt
 
@@ -102,74 +102,149 @@ New icons (all Phosphor regular, named in `AppIcons`): `back`, `chevron`,
 - **The history is the home**, not a separate tab: the app has one screen
   today, and the issue says "on the first page".
 
-## Build brief
+## 3. What was built
 
-Phase 3 starts here; Phase 4 replaces this section with sections 3–5.
+![The real build, seven scenes: first run, a goal picked, summarizing the first call, the home after it, the history, a call opened by id, its numbers](img/build-strip.png)
 
-### Files written in the design session (uncommitted until the queue commits them)
+These are the real widgets, cubit and route over a fake repository. The
+preview entry point was deleted afterwards. Scenes:
+[1](img/build-1.png) first run · [2](img/build-2.png) goal read back ·
+[3](img/build-3.png) *Escrevendo o resumo da sua ligação…* ·
+[4](img/build-4.png) after the first call · [5](img/build-5.png) the
+history · [6](img/build-6.png) a call opened by id (`CallDetailRoute`) ·
+[7](img/build-7.png) its numbers.
 
-- `app/lib/call_history_preview.dart`: the preview, six scenes over a seeded
-  `CallHistoryCubit` (delete it in Phase 4 after the build prints).
-- `app/lib/home/home_page.dart`: `HomePage` (provides an empty
-  `CallHistoryCubit` for now) and `HomeView` (first run vs history).
-- `app/packages/call_history/` (new, in `app/pubspec.yaml`): `CallRecord`,
-  `CallMetrics`, `SpeakingGoal`, `CallHistoryCubit`/`State` (no repository
-  yet), `CallFormat` (`callWhen`, `callDuration`, `callCost`, `now` passed
-  in), views `GoalPicker`, `CallCard`, `CallDetailPage`.
-- `app/packages/app_ui/`: widgets `AppCard`, `AppChoiceChip`, `AppMeta`;
-  tokens `AppSpacing.iconSmall`, `AppSpacing.badge`; the icons above.
-- `app/packages/l10n/lib/arb/app_pt.arb` (+ `gen/`): the new strings.
-  `homeWrite`, `homeCallTitle`, `homeCallBody`, `homeEmptyTitle` and
-  `homeEmptyBody` are now unused: remove them in the build.
+### The contract
 
-### What the build must do
+**The audio and the transcript are never stored.** When the call's socket
+closes, the server keeps a call only if the person was answered at least
+once. The model writes `{ title, summary, learnings }` once, from the
+conversation and the numbers. Only those notes, the numbers summed from the
+takes, the time and the cost go into Postgres. A follow-up
+(`?follows=<id>`) tells the coach the subject's last 3 calls. Full
+contract: [product/spec/call-history.md](../../spec/call-history.md).
 
-**Server** (`server/src/calls/`, a Nest module, `SessionGuard` and
-`@CurrentUser()` on every route, every query scoped to the user):
+### Server (`server/src/calls/`, a Nest module)
 
-- Tables in `db/schema.ts`: `user_goal` (or a `goal` column on the user),
-  and `calls` (id, user id, started at, duration ms, cost USD, title,
-  summary, learnings JSON, metrics JSON, `follows_call_id` nullable,
-  `subject_id`, seen at). `npm run db:generate`.
-- At the end of a call the voice session (`voice-session.ts`) stores the
-  call: it already knows duration and cost per turn and the metrics of each
-  take; it asks the model once, after hang-up, for `{ title, summary,
-  learnings[] }` in Portuguese from the transcript and the numbers, and
-  writes the row. The audio and the transcript are still not stored; only
-  what the model wrote and the numbers. **This changes the voice-call
-  spec's "Nothing is kept"**: update `product/spec/voice-call.md`.
-- Routes: `GET /api/calls` (newest first), `GET /api/calls/:id`,
-  `POST /api/calls/:id/seen`, `PUT /api/users/me/goal { goal }` (refuse an
-  unknown goal, in Portuguese). Rows in `analytics/events.ts` for the
-  writes (no words, only the goal's key).
-- The socket takes `?goal=` on the first call and `?follows=<callId>` on a
-  follow-up: the coach's system prompt then gets the goal, or the subject's
-  earlier calls (summaries, learnings, numbers; the last few, capped), and
-  the new row gets the same `subject_id` and `subject_index + 1`. Metric
-  deltas are against the subject's first call.
+| Route | What it does |
+|---|---|
+| `GET /api/calls` | `{ goal, calls }`, newest first, each call's metric deltas against the subject's first call |
+| `GET /api/calls/:id` | one call; 404 *Essa ligação não foi encontrada.* |
+| `POST /api/calls/:id/seen` | 204, marks the call as opened (`call_opened` in PostHog) |
+| `PUT /api/users/me/goal` | 204; 400 *Objetivo inválido.* (`goal_chosen`) |
 
-**App:**
+- Tables `call` and `user_goal` (`drizzle/0001_calls.sql`). Better Auth's
+  `user` table is left untouched.
+- `call.store.ts`: the `CallStore` interface, `DrizzleCallStore`, and
+  `InMemoryCallStore` for the specs. Every query is scoped to the user's id.
+- `call-summary.ts`: the notes prompt and a strict parser (fences tolerated,
+  title ≤ 80 chars, 1–3 learnings), the memory prompt (days written in
+  São Paulo time, never the server's zone), and the call's numbers summed
+  from its takes.
+- `calls.service.ts`: `history`, `one`, `markSeen`, `setGoal`, `brief`
+  (what a call opens with) and `record` (what is kept when it ends). If the
+  model fails, the call is still kept, with a fixed title and no learnings.
+- `voice.gateway.ts` reads `?follows=`, asks for the brief before the
+  session starts, and calls `record` on close. `VoiceSession` takes the
+  brief (memory in the prompt; on a follow-up the greeting is *Vamos
+  continuar de onde paramos?*) and exposes `conversation` and `takes`.
+  `coachPrompt(user, memory)`.
+- `speech-metrics.ts` now also counts hesitations (`hesitations`), not
+  only their seconds, because the page shows a count.
 
-- A `CallHistoryRepository` (in `call_history`, over `api_client`), behind
-  the cubit: `load()`, `markSeen(id)`, `saveGoal(goal)`; a fake for tests.
-- `HomePage` gets the cubit from the repository; it reloads when a call
-  ends (the call route pops).
-- Route `/ligacoes/:id` → `CallDetailPage`, marking it seen; *Continuar
-  este assunto* pushes `/ligacao?follows=<id>`, and the first call passes
-  the goal. `CallPage`/`CallService` pass both to the socket.
-- Specs: the cubit (`bloc_test`), `CallFormat` (today, yesterday, a date;
-  minutes, minutes and seconds; cost rounding), `GoalPicker`, `CallCard`,
-  `CallDetailPage`, `HomeView` first run vs history.
+### App
+
+- `packages/call_history`: `CallHistoryRepository` and
+  `ApiCallHistoryRepository`; `CallHistoryCubit` (`load`, `chooseGoal`,
+  `markSeen`, and `afterCall`, which reads the history every 2 s, up to 8
+  times, until the new call appears); `CallRecord.fromJson`;
+  `SpeakingGoal.fromKey`.
+- `lib/home/home_page.dart`: `startCall` and `openCall`, plus loading,
+  failed (with *Tentar de novo*) and summarizing states.
+  `lib/home/call_detail_route.dart`: `/ligacoes/:id`, which takes the call
+  from the home or reads it by id.
+- `packages/call`: `CallPage(follows:)`, `CallCubit.follows` and
+  `.connected`, `CallService.dial(follows:)`. Hanging up pops whether the
+  call got through, so a call that never connected doesn't trigger the
+  summarizing wait.
+- Strings: added `homeNextBody`, `historySummarizing`, `historyLoadFailed`,
+  `historyRetry` and `callLoadFailed`. Removed the five unused strings the
+  brief named.
+
+### Tests
+
+`.tool/check` passes: app analyze, every touched package, server eslint,
+tsc and tests.
+
+- Server: 58 tests in 8 suites. New ones: `calls.service.spec.ts` (keeping,
+  nothing kept without a turn, model failure, the follow-up's subject index
+  and deltas, someone else's call ignored, the goal in the brief, scoping
+  per user, goal refusals), `call-summary.spec.ts` (parsing, the 3-call
+  cap, São Paulo days), a follow-up case in `voice-session.spec.ts`, and a
+  hesitation count in `speech-metrics.spec.ts`.
+- `call_history`: 18 tests (cubit, JSON, `CallFormat`, `GoalPicker`,
+  `CallCard`, `CallDetailPage`).
+- `call`: 15 tests (3 new: dialing with `follows`, the socket URL,
+  `connected`).
+- App: 8 tests (the home's first run and its history).
+- No flaky test was seen.
+
+### Where the build differs from the design
+
+- **No `?goal=` on the socket.** The goal is saved with
+  `PUT /users/me/goal` the moment it's picked, and the server reads it for
+  every call's brief. One source, and later calls also remember why the
+  person came. The cost: if saving the goal fails, the first call just
+  doesn't know it.
+- **Two states the board didn't draw**: *Escrevendo o resumo da sua
+  ligação…* (scene 3, and as a card on top of the history), because the
+  notes take a few seconds after hang-up; and loading/failed states for the
+  history and the detail.
+- **The follow-up starts from the home.** *Continuar este assunto* pops
+  back to the home, which dials and then reloads the history. On a detail
+  opened directly (a web reload) it dials straight from there.
+- **The cost includes the notes**: the call's Deepgram and model turns,
+  plus the one model call that writes the summary.
+
+### Decided unattended
+
+- An unknown or foreign `?follows=` id **starts a fresh call** instead of
+  refusing it: the person still gets a call. It never reads another
+  person's call.
+- A call in which the person was never answered **isn't kept**.
+- A follow-up's memory is capped at the **last 3 calls** on the subject.
+- Calls are kept forever and can't be deleted. Deletion was left out, as
+  in the design (open question below).
+
+### Not tested
+
+- **Never run against the real Deepgram, OpenRouter or Postgres.** The
+  notes prompt has not been seen answering from a real model. The parser
+  tolerates fences and refuses anything without a title and a summary. The
+  migration was generated by drizzle-kit and not applied to a database
+  here.
+- Not tried on a phone. The `?follows=` socket URL is covered by a unit
+  test only.
 
 ### Open questions
 
-- Should a person be able to **delete** a call from the history? Not in
-  the issue; left out of the design.
-- The cost shown is **what the call cost Vox** (Deepgram + model), as the
-  issue asks. If Vox later charges the person a price of its own, this
-  number should become that.
+- Should a person be able to **delete** a call from the history?
+- The cost shown is **what the call cost Vox**. If Vox later charges a
+  price of its own, this should become that.
 
-### Cost and time of the design session
+## 4. How to turn it on
 
-Measured by the queue, which writes the figures in the PR (the run was told
-to skip `.tool/cost`).
+Nothing new to set. The migration `0001_calls` runs on server boot. The
+history needs the database the server already has. The notes and the call
+need `OPENROUTER_API_KEY`, `OPENROUTER_MODEL` and `DEEPGRAM_API_KEY`, as
+before. Without them there are no calls, so the home stays the first-run
+invitation. If only the notes fail, calls are kept without a summary.
+
+## 5. Cost and time
+
+Measured by the queue: see the pull request.
+
+Outside Claude, the build caused no spend. Nothing called OpenRouter or
+Deepgram; every test ran against fakes. In production, each kept call adds
+one model call for its notes, and that cost is included in the call's own
+US$.

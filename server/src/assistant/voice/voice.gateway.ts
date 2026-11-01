@@ -13,6 +13,7 @@ import type { Analytics } from '../../analytics/analytics';
 import type { Auth } from '../../auth/auth';
 import { AUTH, AuthUser } from '../../auth/auth.tokens';
 import { headersOf } from '../../auth/session.guard';
+import { CallBrief, CallsService } from '../../calls/calls.service';
 import { OpenRouterClient } from '../openrouter.client';
 import { bytesOf, Deepgram } from './deepgram';
 import { VoiceSession } from './voice-session';
@@ -29,6 +30,10 @@ export const UNAUTHORIZED = 4401;
  * or the session cookie, on the upgrade request); without
  * `DEEPGRAM_API_KEY` or a model it closes with [UNAVAILABLE], as the chat
  * answers 503.
+ *
+ * `?follows=<callId>` continues a subject: the coach is told the earlier
+ * calls on it. When the socket closes, the call goes to the history
+ * (`CallsService.record`), which keeps the model's notes and the numbers.
  */
 @Injectable()
 export class VoiceGateway implements OnApplicationShutdown {
@@ -44,6 +49,7 @@ export class VoiceGateway implements OnApplicationShutdown {
     @Inject(ANALYTICS) private readonly _analytics: Analytics,
     private readonly _model: OpenRouterClient,
     private readonly _config: ConfigService,
+    private readonly _calls: CallsService,
   ) {
     this._vendor = new Deepgram(_config.get<string>('DEEPGRAM_API_KEY') ?? '');
   }
@@ -94,23 +100,37 @@ export class VoiceGateway implements OnApplicationShutdown {
       this._logger.warn(`session check failed: ${String(error)}`);
     }
 
+    const available = this._vendor.configured && this._model.configured;
+    let brief: CallBrief = { memory: '' };
+    if (user !== undefined && available) {
+      const follows =
+        new URL(request.url ?? '', 'http://x').searchParams.get('follows') ??
+        undefined;
+      try {
+        brief = await this._calls.brief(user.id, follows);
+      } catch (error) {
+        // The history is a bonus: without it the call still starts.
+        this._logger.warn(`brief failed: ${String(error)}`);
+      }
+    }
+
     this._wss.handleUpgrade(request, socket, head, (ws) => {
       if (user === undefined) {
         ws.close(UNAUTHORIZED, 'Entre de novo para ligar.');
         return;
       }
-      if (!this._vendor.configured || !this._model.configured) {
+      if (!available) {
         ws.close(
           UNAVAILABLE,
           'A ligação ainda não está disponível neste servidor.',
         );
         return;
       }
-      this._call(ws, user);
+      this._call(ws, user, brief);
     });
   }
 
-  private _call(ws: WebSocket, user: AuthUser): void {
+  private _call(ws: WebSocket, user: AuthUser, brief: CallBrief): void {
     const started = Date.now();
     const log = (line: string) => this._logger.log(`[${user.id}] ${line}`);
     log('call started');
@@ -125,6 +145,8 @@ export class VoiceGateway implements OnApplicationShutdown {
       this._vendor,
       this._model,
       log,
+      undefined,
+      { memory: brief.memory, followUp: brief.follows !== undefined },
     );
 
     ws.on('message', (data, binary) => {
@@ -148,7 +170,19 @@ export class VoiceGateway implements OnApplicationShutdown {
         heard_s: Math.round(r.heardS),
         spoken_chars: r.spokenChars,
         usd: r.usd,
+        follow_up: brief.follows !== undefined,
       });
+      this._calls
+        .record(user.id, brief, {
+          startedAt: new Date(started),
+          durationMs: Date.now() - started,
+          usd: r.usd,
+          turns: r.turns,
+          conversation: session.conversation,
+          takes: session.takes,
+        })
+        .then((row) => row && log(`call kept: ${row.id}`))
+        .catch((error: unknown) => log(`call not kept: ${String(error)}`));
     });
     ws.on('error', (error) => log(`socket error: ${error.message}`));
   }

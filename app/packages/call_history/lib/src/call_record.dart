@@ -16,6 +16,16 @@ class CallMetrics extends Equatable {
     this.hesitationsDelta,
   });
 
+  /// As `GET /calls` sends it.
+  factory CallMetrics.fromJson(Map<String, dynamic> json) => CallMetrics(
+    wordsPerMinute: (json['wordsPerMinute'] as num).round(),
+    longPauses: (json['longPauses'] as num).round(),
+    hesitations: (json['hesitations'] as num).round(),
+    wordsPerMinuteDelta: (json['wordsPerMinuteDelta'] as num?)?.round(),
+    longPausesDelta: (json['longPausesDelta'] as num?)?.round(),
+    hesitationsDelta: (json['hesitationsDelta'] as num?)?.round(),
+  );
+
   /// The pace, in words a minute.
   final int wordsPerMinute;
 
@@ -64,6 +74,28 @@ class CallRecord extends Equatable {
     this.seen = true,
   });
 
+  /// As `GET /calls` sends it. The start comes in UTC and is shown in the
+  /// phone's zone.
+  factory CallRecord.fromJson(Map<String, dynamic> json) {
+    final metrics = json['metrics'];
+    return CallRecord(
+      id: json['id'] as String,
+      startedAt: DateTime.parse(json['startedAt'] as String).toLocal(),
+      duration: Duration(milliseconds: (json['durationMs'] as num).round()),
+      costUsd: (json['costUsd'] as num).toDouble(),
+      title: json['title'] as String,
+      summary: json['summary'] as String,
+      learnings: [
+        for (final it in json['learnings'] as List<dynamic>) it as String,
+      ],
+      metrics: metrics is Map<String, dynamic>
+          ? CallMetrics.fromJson(metrics)
+          : null,
+      subjectIndex: (json['subjectIndex'] as num?)?.round() ?? 1,
+      seen: json['seen'] as bool? ?? true,
+    );
+  }
+
   /// The server's id.
   final String id;
 
@@ -94,6 +126,21 @@ class CallRecord extends Equatable {
 
   /// Whether the person has opened it.
   final bool seen;
+
+  /// The same call, opened.
+  CallRecord asSeen() => seen
+      ? this
+      : CallRecord(
+          id: id,
+          startedAt: startedAt,
+          duration: duration,
+          costUsd: costUsd,
+          title: title,
+          summary: summary,
+          learnings: learnings,
+          metrics: metrics,
+          subjectIndex: subjectIndex,
+        );
 
   @override
   List<Object?> get props => [

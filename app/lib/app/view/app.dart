@@ -2,11 +2,13 @@ import 'package:analytics/analytics.dart';
 import 'package:app_ui/app_ui.dart';
 import 'package:auth/auth.dart';
 import 'package:call/call.dart';
+import 'package:call_history/call_history.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:l10n/l10n.dart';
 import 'package:vox/app/app.dart';
 import 'package:vox/assistant/assistant.dart';
+import 'package:vox/home/call_detail_route.dart';
 import 'package:vox/home/home_page.dart';
 
 /// {@template app}
@@ -32,7 +34,18 @@ class App extends StatelessWidget {
            GoRoute(
              path: '/ligacao',
              name: 'Ligação',
-             builder: (context, state) => const CallPage(),
+             builder: (context, state) =>
+                 CallPage(follows: state.uri.queryParameters['follows']),
+           ),
+           GoRoute(
+             path: '/ligacoes/:id',
+             name: 'Ligação anterior',
+             builder: (context, state) => CallDetailRoute(
+               id: state.pathParameters['id']!,
+               call: state.extra is CallRecord
+                   ? state.extra! as CallRecord
+                   : null,
+             ),
            ),
            GoRoute(
              path: '/assistente',

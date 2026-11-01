@@ -556,6 +556,108 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'O Vox lembra desta conversa e começa de onde vocês pararam.'**
   String get callFollowUpNote;
+
+  /// The home's one button: picks a coach and starts a call on a new subject.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo assunto'**
+  String get homeNewSubject;
+
+  /// The heading over the list of subjects on the home.
+  ///
+  /// In pt, this message translates to:
+  /// **'Seus assuntos'**
+  String get subjectsTitle;
+
+  /// The heading over a subject's calls on its page.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ligações'**
+  String get subjectCallsTitle;
+
+  /// The subject page's one button: calls the same coach again on it.
+  ///
+  /// In pt, this message translates to:
+  /// **'Continuar com {coach}'**
+  String subjectContinue(String coach);
+
+  /// Which call on its subject this is, in a small round badge.
+  ///
+  /// In pt, this message translates to:
+  /// **'{index}ª'**
+  String callSubjectIndexShort(int index);
+
+  /// The coach sheet's heading.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novo assunto'**
+  String get coachPickerTitle;
+
+  /// Under the coach sheet's heading: the coach is kept for every call on the subject.
+  ///
+  /// In pt, this message translates to:
+  /// **'Quem te acompanha nele? Fica o mesmo até o fim do assunto.'**
+  String get coachPickerBody;
+
+  /// The coach sheet's button: starts the subject's first call.
+  ///
+  /// In pt, this message translates to:
+  /// **'Começar com {coach}'**
+  String coachPickerStart(String coach);
+
+  /// Tooltip of the speaker button that plays a coach's voice.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ouvir {coach}'**
+  String coachPickerListen(String coach);
+
+  /// A coach's name: the Flux TTS voice's own name, never translated.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bianca'**
+  String get coachBianca;
+
+  /// No description provided for @coachBruno.
+  ///
+  /// In pt, this message translates to:
+  /// **'Bruno'**
+  String get coachBruno;
+
+  /// No description provided for @coachHaley.
+  ///
+  /// In pt, this message translates to:
+  /// **'Haley'**
+  String get coachHaley;
+
+  /// No description provided for @coachMarcus.
+  ///
+  /// In pt, this message translates to:
+  /// **'Marcus'**
+  String get coachMarcus;
+
+  /// A coach group: the calls are in Brazilian Portuguese.
+  ///
+  /// In pt, this message translates to:
+  /// **'Português'**
+  String get languagePortuguese;
+
+  /// A coach group: the calls are in English.
+  ///
+  /// In pt, this message translates to:
+  /// **'Inglês'**
+  String get languageEnglish;
+
+  /// The tiny language tag on a coach's avatar.
+  ///
+  /// In pt, this message translates to:
+  /// **'PT'**
+  String get languageTagPt;
+
+  /// No description provided for @languageTagEn.
+  ///
+  /// In pt, this message translates to:
+  /// **'EN'**
+  String get languageTagEn;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

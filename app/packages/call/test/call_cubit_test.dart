@@ -45,6 +45,10 @@ void main() {
         'wss://vox.example/api/assistant/voice?follows=c1',
       );
       expect(
+        service.uri(coach: 'haley').toString(),
+        'wss://vox.example/api/assistant/voice?coach=haley',
+      );
+      expect(
         service.uri().toString(),
         'wss://vox.example/api/assistant/voice',
       );

@@ -1,4 +1,5 @@
 import { AuthUser } from '../../auth/auth.tokens';
+import { Coach, coachOf } from '../../calls/coaches';
 import { SpeechMetrics } from './speech-metrics';
 
 /**
@@ -13,15 +14,26 @@ export const TAKE_SECONDS = 15;
 /**
  * The system prompt of a call. [memory] is what the history adds: the
  * person's goal, or the earlier calls on the subject a follow-up continues.
+ * [coach] names who speaks and the language the whole call is in; the
+ * instructions stay in Portuguese, the replies follow the coach.
  */
-export function coachPrompt(user: AuthUser, memory = ''): string {
+export function coachPrompt(
+  user: AuthUser,
+  memory = '',
+  coach: Coach = coachOf(),
+): string {
   const name = user.name.split(' ')[0] || user.name;
+  const english = coach.language === 'en';
   const lines = [
-    'Você é o Vox, um treinador de fala e apresentação, numa ligação de voz.',
+    `Você é ${coach.name}, ${coach.role} de fala e apresentação do Vox, numa ligação de voz.`,
     `Você está falando com ${name}. Tudo o que você escreve é falado em voz alta.`,
-    'Fale como numa ligação: frases curtas, em português do Brasil, sem listas, sem markdown, sem emojis.',
+    english
+      ? 'Esta ligação é inteiramente em inglês: responda sempre em inglês, mesmo que a pessoa fale português, e ajude-a a treinar a fala em inglês. Fale como numa ligação: frases curtas, sem listas, sem markdown, sem emojis.'
+      : 'Fale como numa ligação: frases curtas, em português do Brasil, sem listas, sem markdown, sem emojis.',
     'Responda em no máximo três ou quatro frases e termine com uma pergunta ou um próximo passo.',
-    'Escreva números por extenso quando forem poucos, e arredonde: "cerca de cento e vinte palavras por minuto".',
+    english
+      ? 'Escreva números por extenso quando forem poucos, e arredonde: "about a hundred and twenty words per minute".'
+      : 'Escreva números por extenso quando forem poucos, e arredonde: "cerca de cento e vinte palavras por minuto".',
     'Quando a fala da pessoa for longa, você recebe os números dela medidos em código: ritmo, pausas, hesitações e entonação, e os da primeira fala dela na ligação, que é a referência.',
     'Use esses números. Nunca invente uma medida que não recebeu, e compare com a referência da própria pessoa, não com uma norma.',
     'A transcrição é automática e pode trocar palavras: nunca aponte uma palavra estranha como erro de dicção, e só cite trechos que fazem sentido.',
@@ -30,6 +42,22 @@ export function coachPrompt(user: AuthUser, memory = ''): string {
   ];
   if (memory.trim() !== '') lines.push('', memory.trim());
   return lines.join('\n');
+}
+
+/** The coach's first sentence, in their language. */
+export function greeting(
+  name: string,
+  coach: Coach = coachOf(),
+  followUp = false,
+): string {
+  if (coach.language === 'en') {
+    return followUp
+      ? `Hi, ${name}! Shall we pick up where we left off?`
+      : `Hi, ${name}! What would you like to practice today?`;
+  }
+  return followUp
+    ? `Oi, ${name}! Vamos continuar de onde paramos?`
+    : `Oi, ${name}! O que você quer treinar hoje?`;
 }
 
 /** The person's turn as the model reads it: the words, then the numbers. */

@@ -80,6 +80,15 @@ abstract final class AppTypography {
     color: AppColors.ink2,
   );
 
+  /// Sans 10 bold. The tiny tag on an avatar, the language it speaks.
+  static TextStyle get tag => face(
+    size: 10,
+    weight: FontWeight.w700,
+    height: 1.5,
+    tracking: 0.04,
+    color: AppColors.ink2,
+  );
+
   /// The Material text theme, built from the scale above.
   static TextTheme get textTheme => TextTheme(
     displayLarge: display,

@@ -16,6 +16,7 @@ import {
   parseNotes,
 } from './call-summary';
 import type { CallRow, CallStore } from './call.store';
+import { Coach, coachOf } from './coaches';
 import { Goal } from './goals';
 
 /** The Nest token the store is injected under. */
@@ -47,6 +48,10 @@ export interface CallView {
   learnings: string[];
   metrics: CallMetricsView | null;
   subjectIndex: number;
+  /** The id of the subject's first call. */
+  subjectId: string;
+  /** Who coached it: a `CoachKey`. */
+  coach: string;
   seen: boolean;
 }
 
@@ -56,6 +61,8 @@ export interface CallBrief {
   memory: string;
   /** The call this one follows up, the person's own. */
   follows?: CallRow;
+  /** Who speaks: the subject's coach on a follow-up, else the one asked for. */
+  coach: Coach;
 }
 
 /** What the voice session knows when a call ends. */
@@ -120,9 +127,15 @@ export class CallsService {
 
   /**
    * What a call opens with. [followsId] that isn't one of the person's
-   * calls is ignored: the call starts fresh rather than not at all.
+   * calls is ignored: the call starts fresh rather than not at all, with
+   * [coachKey] (Bianca when unknown). A follow-up keeps its subject's
+   * coach whatever [coachKey] says.
    */
-  async brief(userId: string, followsId?: string): Promise<CallBrief> {
+  async brief(
+    userId: string,
+    followsId?: string,
+    coachKey?: string,
+  ): Promise<CallBrief> {
     const goal = await this._store.goal(userId);
     const follows = followsId
       ? await this._store.get(userId, followsId)
@@ -130,7 +143,11 @@ export class CallsService {
     const earlier = follows
       ? await this._store.subject(userId, follows.subjectId)
       : [];
-    return { memory: memoryPrompt(goal, earlier), follows };
+    return {
+      memory: memoryPrompt(goal, earlier),
+      follows,
+      coach: coachOf(follows ? follows.coach : coachKey),
+    };
   }
 
   /**
@@ -187,6 +204,7 @@ export class CallsService {
       subjectId: follows?.subjectId ?? id,
       subjectIndex,
       followsCallId: follows?.id ?? null,
+      coach: brief.coach.key,
       seenAt: null,
     };
     await this._store.insert(row);
@@ -218,6 +236,8 @@ function viewOf(row: CallRow, first?: CallRow): CallView {
         }
       : null,
     subjectIndex: row.subjectIndex,
+    subjectId: row.subjectId,
+    coach: coachOf(row.coach).key,
     seen: row.seenAt !== null,
   };
 }

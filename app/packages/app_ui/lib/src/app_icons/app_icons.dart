@@ -113,4 +113,21 @@ class AppIcons {
 
   /// Goal: anything else.
   static const goalOther = AppIconData.phosphor(PhosphorIconsRegular.dotsThree);
+
+  /// A new subject: a call that starts a thread of its own.
+  static const newSubject = AppIconData.phosphor(
+    PhosphorIconsRegular.phonePlus,
+  );
+
+  /// How many calls a subject has had.
+  static const calls = AppIconData.phosphor(PhosphorIconsRegular.phoneList);
+
+  /// Plays a coach's voice before picking it.
+  static const listen = AppIconData.phosphor(PhosphorIconsRegular.speakerHigh);
+
+  /// A number that went up since a subject's first call.
+  static const trendUp = AppIconData.phosphor(PhosphorIconsRegular.trendUp);
+
+  /// A number that went down since a subject's first call.
+  static const trendDown = AppIconData.phosphor(PhosphorIconsRegular.trendDown);
 }

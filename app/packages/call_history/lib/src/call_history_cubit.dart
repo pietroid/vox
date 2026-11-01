@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:call_history/src/call_history_repository.dart';
 import 'package:call_history/src/call_record.dart';
+import 'package:call_history/src/call_subject.dart';
 import 'package:call_history/src/speaking_goal.dart';
 import 'package:equatable/equatable.dart';
 
@@ -43,6 +44,9 @@ class CallHistoryState extends Equatable {
 
   /// A call just ended and its notes are still being written.
   final bool summarizing;
+
+  /// The calls grouped by subject, the newest subject first.
+  List<CallSubject> get subjects => CallSubject.group(calls);
 
   /// Whether the person has never finished a call.
   bool get isFirstRun => calls.isEmpty;

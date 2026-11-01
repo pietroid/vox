@@ -22,11 +22,15 @@ class CallCubit extends Cubit<CallState> {
   CallCubit({
     required this._service,
     this.follows,
+    this.coach,
     CallState initial = const CallState(),
   }) : super(initial);
 
   /// The id of the call this one continues, if it does.
   final String? follows;
+
+  /// Who starts the subject, when this call starts one.
+  final String? coach;
 
   /// How often the clock, the rings and the timer move: ~20 times a second.
   static const tick = Duration(milliseconds: 50);
@@ -61,7 +65,7 @@ class CallCubit extends Cubit<CallState> {
       return;
     }
     try {
-      final line = await _service.dial(follows: follows);
+      final line = await _service.dial(follows: follows, coach: coach);
       if (_ended) {
         await line.close();
         return;

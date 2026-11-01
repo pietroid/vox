@@ -15,6 +15,13 @@
       "when": 1793559275469,
       "tag": "0001_calls",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793562317407,
+      "tag": "0002_call_coach",
+      "breakpoints": true
     }
   ]
 }

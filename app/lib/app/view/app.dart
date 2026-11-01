@@ -10,6 +10,7 @@ import 'package:vox/app/app.dart';
 import 'package:vox/assistant/assistant.dart';
 import 'package:vox/home/call_detail_route.dart';
 import 'package:vox/home/home_page.dart';
+import 'package:vox/home/subject_route.dart';
 
 /// {@template app}
 /// The root widget: the router, the theme and the strings.
@@ -34,8 +35,20 @@ class App extends StatelessWidget {
            GoRoute(
              path: '/ligacao',
              name: 'Ligação',
-             builder: (context, state) =>
-                 CallPage(follows: state.uri.queryParameters['follows']),
+             builder: (context, state) => CallPage(
+               follows: state.uri.queryParameters['follows'],
+               coach: state.uri.queryParameters['coach'],
+             ),
+           ),
+           GoRoute(
+             path: '/assuntos/:id',
+             name: 'Assunto',
+             builder: (context, state) => SubjectRoute(
+               id: state.pathParameters['id']!,
+               subject: state.extra is CallSubject
+                   ? state.extra! as CallSubject
+                   : null,
+             ),
            ),
            GoRoute(
              path: '/ligacoes/:id',

@@ -73,7 +73,7 @@ class FakeCallService implements CallService {
   final dialed = <String?>[];
 
   @override
-  Future<VoiceLine> dial({String? follows}) async {
+  Future<VoiceLine> dial({String? follows, String? coach}) async {
     dialed.add(follows);
     if (fails != null) throw fails!;
     return line;

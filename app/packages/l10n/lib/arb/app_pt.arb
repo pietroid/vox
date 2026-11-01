@@ -43,5 +43,154 @@
   "callHangUp": "Encerrar ligação",
   "callUnavailable": "A ligação não está disponível agora. Tente mais tarde ou converse por escrito.",
   "callDropped": "A ligação caiu. Tente de novo.",
-  "callMicrophoneDenied": "O Vox precisa do microfone para a ligação. Permita o acesso nos Ajustes do telefone."
+  "callMicrophoneDenied": "O Vox precisa do microfone para a ligação. Permita o acesso nos Ajustes do telefone.",
+  "homeOpenAssistant": "Conversar por escrito",
+  "@homeOpenAssistant": {
+    "description": "The top bar's icon that opens the written chat."
+  },
+  "homeOnboardingTitle": "Vamos ouvir sua voz",
+  "@homeOnboardingTitle": {
+    "description": "The first-run home's headline, before the first call."
+  },
+  "homeOnboardingBody": "Na primeira ligação, você fala por uns três minutos e o Vox devolve seu ritmo, suas pausas e o que treinar.",
+  "homeGoalQuestion": "O que te traz aqui?",
+  "homeGoalHint": "Escolha um. A primeira ligação começa por aí.",
+  "homeFirstCallStart": "Fazer minha primeira ligação",
+  "homeFirstCallNote": "Uns três minutos · só você e o Vox",
+  "goalPresentations": "Apresentações",
+  "goalInterviews": "Entrevistas",
+  "goalMeetings": "Reuniões",
+  "goalTeaching": "Aulas",
+  "goalRecording": "Podcast e vídeo",
+  "goalCalm": "Falar com calma",
+  "goalOther": "Outra coisa",
+  "goalPresentationsPlan": "O Vox vai pedir que você apresente um tema do seu trabalho em um minuto, como numa reunião de verdade.",
+  "@goalPresentationsPlan": {
+    "description": "What the first call does for this goal."
+  },
+  "goalInterviewsPlan": "O Vox faz de entrevistador: uma pergunta clássica, sua resposta, e o que ela passou.",
+  "goalMeetingsPlan": "O Vox simula uma reunião e pede sua opinião sobre um tema. Você treina falar sem rodeios.",
+  "goalTeachingPlan": "Você explica um assunto que conhece como se fosse para a turma, e o Vox mede seu ritmo.",
+  "goalRecordingPlan": "Você grava uma abertura de episódio, e o Vox ouve como ela soaria para quem escuta.",
+  "goalCalmPlan": "Uma conversa leve, sem pressa. O Vox mostra onde sua fala acelera.",
+  "goalOtherPlan": "O Vox começa perguntando o que você quer treinar, e segue a partir daí.",
+  "homeFirstDoneTitle": "Primeira ligação feita",
+  "@homeFirstDoneTitle": {
+    "description": "The home's call-out right after the first call."
+  },
+  "homeFirstDoneBody": "Seu resumo está logo abaixo. Ligue de novo quando quiser: o Vox lembra do que vocês conversaram.",
+  "homeNextTitle": "Pronto para a próxima?",
+  "@homeNextTitle": {
+    "description": "The home's call-out once there is a history."
+  },
+  "homeNextLastLearning": "Da última vez: {learning}",
+  "@homeNextLastLearning": {
+    "description": "The last call's first learning, under the call-out.",
+    "placeholders": {
+      "learning": {
+        "type": "String"
+      }
+    }
+  },
+  "historyTitle": "Suas ligações",
+  "historyTotals": "{count, plural, =1{1 ligação} other{{count} ligações}} · {duration}",
+  "@historyTotals": {
+    "description": "Under the history's title: how many calls and how long they took together.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "callNew": "Nova",
+  "@callNew": {
+    "description": "The badge on a call the person has not opened yet."
+  },
+  "callToday": "Hoje, {time}",
+  "@callToday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callYesterday": "Ontem, {time}",
+  "@callYesterday": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callOnDay": "{day}, {time}",
+  "@callOnDay": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "callMinutes": "{minutes} min",
+  "@callMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "callMinutesSeconds": "{minutes} min {seconds} s",
+  "@callMinutesSeconds": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "callCost": "US$ {amount}",
+  "@callCost": {
+    "description": "What a call cost, in dollars, the amount already written with a comma.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "callSubjectIndex": "{index}ª do assunto",
+  "@callSubjectIndex": {
+    "description": "On a call that follows up an earlier one: which call on the subject it is.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "callDetailSummary": "Resumo",
+  "callDetailLearnings": "O que levar daqui",
+  "callDetailNumbers": "Seus números",
+  "metricPace": "palavras/min",
+  "metricPauses": "pausas longas",
+  "metricHesitations": "hesitações",
+  "metricSinceFirst": "{delta} desde a 1ª",
+  "@metricSinceFirst": {
+    "description": "How a number moved since the first call on the subject, signed.",
+    "placeholders": {
+      "delta": {
+        "type": "String"
+      }
+    }
+  },
+  "callFollowUpStart": "Continuar este assunto",
+  "@callFollowUpStart": {
+    "description": "The detail's one button: a new call that picks up this one."
+  },
+  "callFollowUpNote": "O Vox lembra desta conversa e começa de onde vocês pararam."
 }

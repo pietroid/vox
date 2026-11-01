@@ -1,0 +1,187 @@
+{
+ "title": "Vox: the first call, then the history of calls",
+ "screens": [
+  {
+   "png": "img/mockup-1.png",
+   "title": "1 · Before the first call",
+   "why": "The empty home is an invitation: the agent's presence, one question, one button.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 270,
+     "y": 133,
+     "label": "The presence",
+     "text": "AppPresence, the dot from the mark, as the hero: the same thing the person will talk to in the call. No illustration, no sparkle."
+    },
+    {
+     "id": "B",
+     "x": 36,
+     "y": 403,
+     "label": "O que te traz aqui?",
+     "text": "Seven goal chips (new AppChoiceChip), each with a Phosphor glyph: presentationChart, briefcase, usersThree, chalkboardTeacher, microphoneStage, wind, dotsThree. Optional: the button works without a pick."
+    },
+    {
+     "id": "C",
+     "x": 12,
+     "y": 780,
+     "label": "The one CTA",
+     "text": "Fazer minha primeira ligação: the accent, full width, pinned to the thumb. Same phone glyph as every call button."
+    },
+    {
+     "id": "D",
+     "x": 300,
+     "y": 62,
+     "label": "Writing moves up",
+     "text": "Prefiro escrever leaves the body: the chat is the chat icon in the top bar, beside sign out. One accent action per screen."
+    },
+    {
+     "id": "E",
+     "x": 70,
+     "y": 821,
+     "label": "Sets expectations",
+     "text": "Uns três minutos · só você e o Vox: how long, and that nobody else listens."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-2.png",
+   "title": "2 · A goal picked",
+   "why": "Picking says what the first call will be about, so the button has a promise behind it.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 30,
+     "y": 403,
+     "label": "Selected",
+     "text": "The picked chip turns accentSoft with a teal edge and glyph; no check mark. One goal at a time, changeable."
+    },
+    {
+     "id": "B",
+     "x": 10,
+     "y": 625,
+     "label": "The plan",
+     "text": "One line per goal on what the first call does (here, present a work topic in a minute). The goal goes to the server and opens the first call."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-3.png",
+   "title": "3 · After the first call",
+   "why": "The first call lands at the top of the home; the call-out says where it is and invites the second.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 362,
+     "y": 96,
+     "label": "Call-out",
+     "text": "AppCard on accentSoft: Primeira ligação feita, and the promise that Vox remembers. Começar ligação stays the one accent button."
+    },
+    {
+     "id": "B",
+     "x": 172,
+     "y": 373,
+     "label": "Nova",
+     "text": "A teal badge until the call is opened."
+    },
+    {
+     "id": "C",
+     "x": 148,
+     "y": 318,
+     "label": "Totals",
+     "text": "How many calls and the time spent together, under Suas ligações."
+    },
+    {
+     "id": "D",
+     "x": 10,
+     "y": 471,
+     "label": "First learning",
+     "text": "The card leads with the date, the subject the agent named and two lines of summary, then the first learning behind a lightbulb (Phosphor)."
+    },
+    {
+     "id": "E",
+     "x": 208,
+     "y": 523,
+     "label": "Time and money",
+     "text": "clock: minutes; coins: US$ with a Brazilian comma, what the call cost in Deepgram + model."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-4.png",
+   "title": "4 · The history",
+   "why": "Every call, newest first; the call-out carries the last lesson into the next call.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 362,
+     "y": 134,
+     "label": "Da última vez",
+     "text": "Once there is a history, the call-out quotes the last call's first learning: the reason to call again."
+    },
+    {
+     "id": "B",
+     "x": 362,
+     "y": 505,
+     "label": "Follow-up",
+     "text": "arrowBendDownRight + 2ª do assunto: this call continued an earlier one, with its memory."
+    },
+    {
+     "id": "C",
+     "x": 368,
+     "y": 354,
+     "label": "Opens",
+     "text": "The whole card is the tap target (caret right); it opens /ligacoes/:id."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-5.png",
+   "title": "5 · A call, opened",
+   "why": "The summary and what to take from it, and one button to keep going on the same subject.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 368,
+     "y": 190,
+     "label": "Facts",
+     "text": "Duration to the second, cost, and the subject index, as pills (AppMeta boxed). Date above the serif title."
+    },
+    {
+     "id": "B",
+     "x": 10,
+     "y": 476,
+     "label": "O que levar daqui",
+     "text": "The learnings, numbered in teal circles, most important first."
+    },
+    {
+     "id": "C",
+     "x": 10,
+     "y": 806,
+     "label": "Continuar este assunto",
+     "text": "The page's one button, pinned: a new call that gets this call's summary, learnings and numbers, so memory accumulates. The line above says so."
+    }
+   ]
+  },
+  {
+   "png": "img/mockup-6.png",
+   "title": "6 · Its numbers",
+   "why": "The numbers measured in code, against the first call on the subject.",
+   "pins": [
+    {
+     "id": "A",
+     "x": 230,
+     "y": 563,
+     "label": "Three tiles",
+     "text": "Pace (gauge), long pauses (pause), hesitations (waveform): what speech-metrics.ts already measures."
+    },
+    {
+     "id": "B",
+     "x": 368,
+     "y": 687,
+     "label": "Since the 1ª",
+     "text": "Each number's change since the subject's first call. Only fewer hesitations turns green: pace and pauses have no good direction on their own."
+    }
+   ]
+  }
+ ]
+}

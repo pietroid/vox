@@ -51,4 +51,66 @@ class AppIcons {
   static const hangUp = AppIconData.phosphor(
     PhosphorIconsFill.phoneDisconnect,
   );
+
+  /// Back to the page before.
+  static const back = AppIconData.phosphor(PhosphorIconsRegular.arrowLeft);
+
+  /// Opens a row: the caret at the end of a tappable card.
+  static const chevron = AppIconData.phosphor(PhosphorIconsRegular.caretRight);
+
+  /// How long a call took.
+  static const duration = AppIconData.phosphor(PhosphorIconsRegular.clock);
+
+  /// What a call cost, in dollars.
+  static const cost = AppIconData.phosphor(PhosphorIconsRegular.coins);
+
+  /// A call that follows up an earlier one on the same subject.
+  static const followUp = AppIconData.phosphor(
+    PhosphorIconsRegular.arrowBendDownRight,
+  );
+
+  /// Something the person learned in a call.
+  static const learning = AppIconData.phosphor(PhosphorIconsRegular.lightbulb);
+
+  /// The pace of speech, in words a minute.
+  static const pace = AppIconData.phosphor(PhosphorIconsRegular.gauge);
+
+  /// The long pauses in a talk.
+  static const pauses = AppIconData.phosphor(PhosphorIconsRegular.pause);
+
+  /// The hesitations in a talk: voice with no word in it.
+  static const hesitations = AppIconData.phosphor(
+    PhosphorIconsRegular.waveform,
+  );
+
+  /// Goal: presenting at work.
+  static const goalPresentations = AppIconData.phosphor(
+    PhosphorIconsRegular.presentationChart,
+  );
+
+  /// Goal: job interviews.
+  static const goalInterviews = AppIconData.phosphor(
+    PhosphorIconsRegular.briefcase,
+  );
+
+  /// Goal: speaking up in meetings.
+  static const goalMeetings = AppIconData.phosphor(
+    PhosphorIconsRegular.usersThree,
+  );
+
+  /// Goal: teaching a class.
+  static const goalTeaching = AppIconData.phosphor(
+    PhosphorIconsRegular.chalkboardTeacher,
+  );
+
+  /// Goal: recording a podcast or a video.
+  static const goalRecording = AppIconData.phosphor(
+    PhosphorIconsRegular.microphoneStage,
+  );
+
+  /// Goal: speaking more calmly.
+  static const goalCalm = AppIconData.phosphor(PhosphorIconsRegular.wind);
+
+  /// Goal: anything else.
+  static const goalOther = AppIconData.phosphor(PhosphorIconsRegular.dotsThree);
 }

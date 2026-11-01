@@ -40,8 +40,10 @@ void main() {
     );
 
     expect(find.text('Olá, Ana'), findsOneWidget);
-    expect(find.text('Começar ligação'), findsOneWidget);
-    expect(find.text('Prefiro escrever'), findsOneWidget);
+    // Before the first call, the home invites it and asks for a goal.
+    expect(find.text('Fazer minha primeira ligação'), findsOneWidget);
+    expect(find.text('O que te traz aqui?'), findsOneWidget);
+    expect(find.byTooltip('Conversar por escrito'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Sair'));
     await tester.pump();

@@ -19,6 +19,8 @@ dependencies:
   bloc: ^9.2.1
   call:
     path: packages/call
+  call_history:
+    path: packages/call_history
   equatable: ^2.0.7
   flutter:
     sdk: flutter
